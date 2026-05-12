@@ -35,10 +35,7 @@ namespace WebLoginDemo2.Controllers
                 ViewData["SuccessMessage"] = TempData["SuccessMessage"];
             }
 
-            return View(new LoginViewModel
-            {
-                ReturnUrl = returnUrl
-            });
+            return View(new LoginViewModel());
         }
 
         // ==============================
