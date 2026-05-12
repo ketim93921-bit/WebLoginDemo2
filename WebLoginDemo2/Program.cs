@@ -5,15 +5,29 @@ using WebLoginDemo2.Models;
 using WebLoginDemo2.Services;
 using WebLoginDemo2.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Render / Docker Port 設定
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 // 資料庫
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// 注意：這裡要對應 Render Environment 的 ConnectionStrings__Default
+var connectionString = builder.Configuration.GetConnectionString("Default");
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new Exception("找不到資料庫連線字串 ConnectionStrings:Default，請檢查 appsettings.json 或 Render Environment。");
+}
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 31))));
+    options.UseMySql(
+        connectionString,
+        new MySqlServerVersion(new Version(8, 0, 31))
+    )
+);
 
 // Cookie 驗證
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -24,7 +38,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.SameSite = SameSiteMode.Lax;
     });
 
-// ✅ 補上這個
 builder.Services.AddAuthorization();
 
 builder.Services.AddSingleton<IPasswordHasher<AppUser>, PasswordHasher<AppUser>>();
@@ -41,11 +54,13 @@ builder.Services.AddSession(options =>
 // MVC JSON 設定
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(opts =>
-        opts.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase);
+        opts.JsonSerializerOptions.PropertyNamingPolicy =
+            System.Text.Json.JsonNamingPolicy.CamelCase);
 
 builder.Services.AddSignalR()
     .AddJsonProtocol(opts =>
-        opts.PayloadSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase);
+        opts.PayloadSerializerOptions.PropertyNamingPolicy =
+            System.Text.Json.JsonNamingPolicy.CamelCase);
 
 // LINE
 builder.Services.AddHttpClient();
@@ -59,22 +74,36 @@ builder.Services.AddHostedService<DataPruningService>();
 
 var app = builder.Build();
 
+// 自動套用 Migration，讓 Aiven 自動建立資料表
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
-// 放在 UseHttpsRedirection 前
+// Render 反向代理設定
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
-    ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor
+    ForwardedHeaders =
+        ForwardedHeaders.XForwardedProto |
+        ForwardedHeaders.XForwardedFor
 });
 
-app.UseHttpsRedirection();
+// Render 外層已經有 HTTPS，這行可以先註解避免警告
+// app.UseHttpsRedirection();
+
 app.UseStaticFiles();
+
 app.UseRouting();
+
 app.UseSession();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -84,7 +113,6 @@ app.MapControllerRoute(
 
 app.MapHub<SensorHub>("/sensorHub");
 
-// 讓 attribute route 生效
 app.MapControllers();
 
 app.Run();
