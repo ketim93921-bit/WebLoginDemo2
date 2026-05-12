@@ -1,0 +1,58 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "系統錯誤";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="alert alert-danger shadow-sm">
+                <h1 class="h3 text-danger mb-3">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    系統發生錯誤
+                </h1>
+
+                <p class="mb-3">
+                    很抱歉，系統在處理您的請求時發生未預期的錯誤。<br />
+                    若問題持續發生，請聯絡系統管理員。
+                </p>
+
+                @* 顯示 RequestId，方便你在 Log 或 Server 端對應錯誤 *@
+                @if (Model.ShowRequestId)
+                {
+                    <p class="mb-1">
+                        <strong>Request ID：</strong>
+                        <code>@Model.RequestId</code>
+                    </p>
+                    <p class="text-muted mb-0" style="font-size: 0.9rem;">
+                        （請在回報問題時一併提供上述編號，方便協助查詢）
+                    </p>
+                }
+            </div>
+
+            @* 開發環境提示（只給你自己看文字說明，不會洩漏細節） *@
+            <div class="mt-4 text-muted" style="font-size: 0.9rem;">
+                <h5 class="h6 fw-bold">開發除錯說明</h5>
+                <p class="mb-1">
+                    若要在本機看到詳細錯誤訊息，請將
+                    <code>ASPNETCORE_ENVIRONMENT</code> 設為
+                    <strong>Development</strong>，然後重新啟動應用程式。
+                </p>
+                <p class="mb-0">
+                    在正式環境請勿開啟 Development 模式，以避免將敏感錯誤資訊曝露給使用者。
+                </p>
+            </div>
+
+            <div class="mt-4">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                    返回首頁
+                </a>
+                <a asp-controller="Auth" asp-action="Login" class="btn btn-primary ms-2">
+                    回到登入頁
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>

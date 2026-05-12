@@ -1,0 +1,772 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "智慧農場監控";
+    var userName = User?.Identity?.Name ?? "管理員";
+}
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --bg-body: #f0f2f5;
+            --surface: rgba(255, 255, 255, 0.9);
+            --surface-glass: rgba(255, 255, 255, 0.65);
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: rgba(255, 255, 255, 0.8);
+            --accent-temp: #ff6b6b;
+            --accent-hum: #4dabf7;
+            --accent-light: #fcc419;
+            --accent-soil: #ae3ec9;
+            --accent-ok: #20c997;
+            --accent-warn: #ff8787;
+            --shadow-card: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --surface: rgba(30, 41, 59, 0.85);
+            --surface-glass: rgba(15, 23, 42, 0.6);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: rgba(255, 255, 255, 0.05);
+            --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-body);
+            background-image: radial-gradient(at 0% 0%, rgba(77, 171, 247, 0.1) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(174, 62, 201, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            transition: background 0.3s ease;
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        .glass-nav {
+            background: var(--surface-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            margin-bottom: 30px;
+        }
+
+        .container-custom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 24px;
+            height: 100%;
+            min-height: 200px;
+            box-shadow: var(--shadow-card);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 40px -10px rgba(0,0,0,0.15);
+            }
+
+        .card-bg-circle {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            opacity: 0.1;
+            filter: blur(20px);
+        }
+
+        .card-header-custom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .value-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .unit-label {
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, rgba(150,150,150,0.1) 25%, rgba(150,150,150,0.2) 50%, rgba(150,150,150,0.1) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        .skeleton-text {
+            height: 40px;
+            width: 80px;
+            display: none;
+        }
+
+        @@keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .status-pill {
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .status-pill.ok {
+                background: rgba(32, 201, 151, 0.1);
+                color: var(--accent-ok);
+            }
+
+            .status-pill.warn {
+                background: rgba(255, 135, 135, 0.1);
+                color: var(--accent-warn);
+            }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .chart-container-glass {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: var(--shadow-card);
+            margin-top: 30px;
+        }
+
+        .btn-toggle {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+            .btn-toggle:hover, .btn-toggle.active {
+                background: var(--text-primary);
+                color: var(--bg-body);
+            }
+
+            .btn-toggle:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="glass-nav">
+        <div class="container-custom d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-circle" style="background: var(--accent-ok); color: white;">
+                    <i class="bi bi-flower1"></i>
+                </div>
+                <div>
+                    <h5 class="m-0 fw-bold">智慧農場 <span style="font-weight:300">IoT</span></h5>
+                    <small class="text-secondary" style="font-size:11px;">即時監控系統</small>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <div id="connectionStatus" class="status-pill warn">
+                    <div class="status-dot"></div> <span id="connText">連線中...</span>
+                </div>
+                <div class="vr mx-2 text-secondary"></div>
+                <button class="btn-toggle" onclick="toggleTheme()"><i class="bi bi-moon"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-custom">
+
+        <div class="mb-4 d-flex justify-content-between align-items-end flex-wrap gap-3">
+            <div>
+                <h2 class="fw-bold mb-1">監控儀表板</h2>
+                <p class="text-secondary m-0">歡迎回來，@userName。系統目前運作正常。</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a id="exportBtn" href="#" class="btn-toggle text-decoration-none">
+                    <i class="bi bi-file-earmark-excel"></i> 匯出報表 (CSV)
+                </a>
+            </div>
+        </div>
+
+        <div class="grid-layout">
+
+            <div class="stat-card" style="border-bottom: 4px solid var(--accent-temp)">
+                <div class="card-bg-circle" style="background: var(--accent-temp)"></div>
+                <div class="card-header-custom">
+                    <div class="icon-circle" style="background: rgba(255,107,107,0.1); color: var(--accent-temp)">
+                        <i class="bi bi-thermometer-half"></i>
+                    </div>
+                    <div class="status-pill ok" id="temp_badge">
+                        <div class="status-dot"></div> 正常
+                    </div>
+                </div>
+                <div>
+                    <div id="temp_skel" class="skeleton skeleton-text" style="display:block;"></div>
+                    <div id="temp_value" class="value-display" style="display:none;">--</div>
+                    <div class="unit-label">環境溫度 (°C)</div>
+                </div>
+            </div>
+
+            <div class="stat-card" style="border-bottom: 4px solid var(--accent-hum)">
+                <div class="card-bg-circle" style="background: var(--accent-hum)"></div>
+                <div class="card-header-custom">
+                    <div class="icon-circle" style="background: rgba(77,171,247,0.1); color: var(--accent-hum)">
+                        <i class="bi bi-droplet-fill"></i>
+                    </div>
+                    <div class="status-pill ok" id="hum_badge">
+                        <div class="status-dot"></div> 正常
+                    </div>
+                </div>
+                <div>
+                    <div id="hum_skel" class="skeleton skeleton-text" style="display:block;"></div>
+                    <div id="hum_value" class="value-display" style="display:none;">--</div>
+                    <div class="unit-label">環境濕度 (%)</div>
+                </div>
+            </div>
+
+            <div class="stat-card" style="border-bottom: 4px solid var(--accent-light)">
+                <div class="card-bg-circle" style="background: var(--accent-light)"></div>
+                <div class="card-header-custom">
+                    <div class="icon-circle" style="background: rgba(252,196,25,0.1); color: var(--accent-light)">
+                        <i class="bi bi-sun-fill"></i>
+                    </div>
+                    <div class="status-pill ok">
+                        <div class="status-dot"></div> 運作中
+                    </div>
+                </div>
+                <div>
+                    <div id="light_skel" class="skeleton skeleton-text" style="display:block;"></div>
+                    <div id="light_value" class="value-display" style="display:none;">--</div>
+                    <div class="unit-label">光照強度 (%)</div>
+                </div>
+            </div>
+
+            <div class="stat-card" style="border-bottom: 4px solid var(--accent-soil)">
+                <div class="card-bg-circle" style="background: var(--accent-soil)"></div>
+                <div class="card-header-custom">
+                    <div class="icon-circle" style="background: rgba(174,62,201,0.1); color: var(--accent-soil)">
+                        <i class="bi bi-moisture"></i>
+                    </div>
+                    <div class="status-pill ok" id="soil_badge">
+                        <div class="status-dot"></div> 檢測中
+                    </div>
+                </div>
+                <div>
+                    <div id="soil_skel" class="skeleton skeleton-text" style="display:block;"></div>
+                    <div id="soil_value" class="value-display" style="display:none;">--</div>
+                    <div class="unit-label">土壤狀態</div>
+                </div>
+            </div>
+
+            <div class="stat-card" style="border-bottom: 4px solid var(--accent-ok)">
+                <div class="card-bg-circle" style="background: var(--accent-ok)"></div>
+                <div class="card-header-custom">
+                    <div class="icon-circle" style="background: rgba(32,201,151,0.1); color: var(--accent-ok)">
+                        <i class="bi bi-fan"></i>
+                    </div>
+                    <div class="status-pill ok" id="fan_badge">
+                        <div class="status-dot"></div> 讀取中
+                    </div>
+                </div>
+                <div>
+                    <div id="fan_skel" class="skeleton skeleton-text" style="display:block;"></div>
+                    <div id="fan_value" class="value-display" style="display:none;">--</div>
+                    <div class="unit-label">風扇控制</div>
+
+                    <div class="d-flex gap-2 mt-3">
+                        <button id="fanOnBtn" class="btn-toggle flex-fill" onclick="controlFan(true)">風扇開</button>
+                        <button id="fanOffBtn" class="btn-toggle flex-fill" onclick="controlFan(false)">風扇關</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="chart-container-glass">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <h4 class="fw-bold m-0"><i class="bi bi-activity text-primary me-2"></i>趨勢分析</h4>
+
+                <div class="d-flex gap-2">
+                    <div class="btn-group" role="group">
+                        <button class="btn-toggle active" onclick="changeMetric('temp', this)">溫度</button>
+                        <button class="btn-toggle" onclick="changeMetric('humidity', this)">濕度</button>
+                        <button class="btn-toggle" onclick="changeMetric('light', this)">光照</button>
+                    </div>
+                    <div class="vr text-secondary"></div>
+                    <div class="btn-group" role="group">
+                        <button class="btn-toggle active" onclick="changeDuration(10, this)">10分鐘</button>
+                        <button class="btn-toggle" onclick="changeDuration(30, this)">30分鐘</button>
+                        <button class="btn-toggle" onclick="changeDuration(60, this)">1小時</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="height: 350px; width: 100%;">
+                <canvas id="historyChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.14/signalr.min.js"></script>
+
+    <script>
+        let chartInstance = null;
+        let currentMetric = 'temp';
+        let currentDuration = 10;
+        let hubConnection = null;
+        let historyRefreshTimer = null;
+
+        const COLORS = {
+            temp: '#ff6b6b',
+            humidity: '#4dabf7',
+            light: '#fcc419',
+            soil: '#ae3ec9'
+        };
+
+        function getVal(data, key) {
+            if (!data) return null;
+
+            const candidates = [
+                key,
+                key.charAt(0).toUpperCase() + key.slice(1),
+                key.toUpperCase(),
+                key === 'temp' ? 'Temperature' : null,
+                key === 'hum' ? 'Humidity' : null,
+                key === 'humidity' ? 'Hum' : null
+            ];
+
+            for (let k of candidates) {
+                if (k && data[k] !== undefined) return data[k];
+            }
+
+            return null;
+        }
+
+        function updateDashboard(data) {
+            console.log("收到數據 (Raw):", data);
+
+            const t = getVal(data, 'temp');
+            const h = getVal(data, 'humidity');
+            const l = getVal(data, 'light');
+            const s = getVal(data, 'soil');
+            const f = getVal(data, 'fan');
+
+            updateSingleCard('temp', t);
+            updateSingleCard('hum', h);
+            updateSingleCard('light', l);
+
+            updateTempBadge(t);
+            updateHumBadge(h);
+            updateSoilUI(s);
+            updateFanUI(f);
+        }
+
+        function updateSingleCard(idPrefix, val) {
+            const el = document.getElementById(idPrefix + '_value');
+            const skel = document.getElementById(idPrefix + '_skel');
+
+            if (!el || !skel) return;
+
+            if (val !== null && val !== undefined) {
+                skel.style.display = 'none';
+                el.style.display = 'block';
+                el.innerText = Number(val).toFixed(1);
+            }
+        }
+
+        function updateTempBadge(t) {
+            const badge = document.getElementById('temp_badge');
+            if (!badge || t === null || t === undefined) return;
+
+            const warn = t > 35 || t < 10;
+            badge.className = warn ? 'status-pill warn' : 'status-pill ok';
+            badge.innerHTML = warn
+                ? '<div class="status-dot"></div>異常'
+                : '<div class="status-dot"></div>正常';
+        }
+
+        function updateHumBadge(h) {
+            const badge = document.getElementById('hum_badge');
+            if (!badge || h === null || h === undefined) return;
+
+            const warn = h < 40;
+            badge.className = warn ? 'status-pill warn' : 'status-pill ok';
+            badge.innerHTML = warn
+                ? '<div class="status-dot"></div>偏低'
+                : '<div class="status-dot"></div>正常';
+        }
+
+        function updateSoilUI(s) {
+            const soilEl = document.getElementById('soil_value');
+            const soilSkel = document.getElementById('soil_skel');
+            const soilBadge = document.getElementById('soil_badge');
+
+            if (!soilEl || !soilSkel || !soilBadge) return;
+
+            if (s !== null && s !== undefined) {
+                soilSkel.style.display = 'none';
+                soilEl.style.display = 'block';
+
+                const isWet = Number(s) > 0.5;
+
+                soilEl.innerText = isWet ? "濕潤" : "乾燥";
+                soilEl.style.color = isWet ? "var(--accent-ok)" : "var(--accent-warn)";
+
+                soilBadge.className = isWet ? "status-pill ok" : "status-pill warn";
+                soilBadge.innerHTML = isWet
+                    ? '<div class="status-dot"></div>良好'
+                    : '<div class="status-dot"></div>需澆水';
+            }
+        }
+
+        function updateFanUI(fan) {
+            const fanEl = document.getElementById('fan_value');
+            const fanSkel = document.getElementById('fan_skel');
+            const fanBadge = document.getElementById('fan_badge');
+            const fanOnBtn = document.getElementById('fanOnBtn');
+            const fanOffBtn = document.getElementById('fanOffBtn');
+
+            if (!fanEl || !fanSkel || !fanBadge) return;
+
+            if (fan !== null && fan !== undefined) {
+                fanSkel.style.display = 'none';
+                fanEl.style.display = 'block';
+
+                const isOn = fan === true || fan === 1 || fan === "1";
+
+                fanEl.innerText = isOn ? "開啟" : "關閉";
+                fanEl.style.color = isOn ? "var(--accent-ok)" : "var(--accent-warn)";
+
+                fanBadge.className = isOn ? "status-pill ok" : "status-pill warn";
+                fanBadge.innerHTML = isOn
+                    ? '<div class="status-dot"></div>運轉中'
+                    : '<div class="status-dot"></div>已停止';
+
+                if (fanOnBtn) fanOnBtn.classList.toggle('active', isOn);
+                if (fanOffBtn) fanOffBtn.classList.toggle('active', !isOn);
+            }
+        }
+
+        async function controlFan(on) {
+            const fanOnBtn = document.getElementById('fanOnBtn');
+            const fanOffBtn = document.getElementById('fanOffBtn');
+
+            if (fanOnBtn) fanOnBtn.disabled = true;
+            if (fanOffBtn) fanOffBtn.disabled = true;
+
+            try {
+                const url = on ? '/api/control/fan/on' : '/api/control/fan/off';
+
+                const res = await fetch(url, { method: 'POST' });
+
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(text);
+                }
+
+                updateFanUI(on);
+            } catch (err) {
+                console.error("❌ 風扇控制失敗:", err);
+                alert("風扇控制失敗，請檢查後端與 MQTT 連線。");
+            } finally {
+                if (fanOnBtn) fanOnBtn.disabled = false;
+                if (fanOffBtn) fanOffBtn.disabled = false;
+            }
+        }
+
+        async function startSignalR() {
+            const statusBadge = document.getElementById('connectionStatus');
+            const statusText = document.getElementById('connText');
+
+            try {
+                hubConnection = new signalR.HubConnectionBuilder()
+                    .withUrl("/sensorHub")
+                    .withAutomaticReconnect()
+                    .build();
+
+                hubConnection.on("ReceiveSensorData", (data) => {
+                    updateDashboard(data);
+                });
+
+                hubConnection.onreconnecting(() => {
+                    if (statusBadge) statusBadge.className = "status-pill warn";
+                    if (statusText) statusText.innerText = "重新連線中...";
+                });
+
+                hubConnection.onreconnected(() => {
+                    if (statusBadge) statusBadge.className = "status-pill ok";
+                    if (statusText) statusText.innerText = "已連線";
+                });
+
+                hubConnection.onclose(() => {
+                    if (statusBadge) statusBadge.className = "status-pill warn";
+                    if (statusText) statusText.innerText = "已斷線";
+                });
+
+                await hubConnection.start();
+                console.log("✅ SignalR 已連線");
+
+                if (statusBadge) statusBadge.className = "status-pill ok";
+                if (statusText) statusText.innerText = "已連線";
+            } catch (err) {
+                console.error("❌ SignalR 連線錯誤:", err);
+
+                if (statusBadge) statusBadge.className = "status-pill warn";
+                if (statusText) statusText.innerText = "SignalR 失敗";
+
+                setTimeout(startSignalR, 5000);
+            }
+        }
+
+        async function loadLatest() {
+            try {
+                console.log("開始載入 Latest...");
+                const res = await fetch('/Data/Latest');
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                const data = await res.json();
+                console.log("Latest 成功:", data);
+                updateDashboard(data);
+            } catch (e) {
+                console.error("最新資料載入失敗:", e);
+
+                const statusBadge = document.getElementById('connectionStatus');
+                const statusText = document.getElementById('connText');
+
+                if (statusBadge) statusBadge.className = "status-pill warn";
+                if (statusText) statusText.innerText = "Latest 失敗";
+            }
+        }
+
+        async function loadHistory() {
+            const exportBtn = document.getElementById('exportBtn');
+            if (exportBtn) {
+                exportBtn.href = `/Data/Export?minutes=${currentDuration}`;
+            }
+
+            const canvas = document.getElementById('historyChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            try {
+                console.log("開始載入 History...");
+                const res = await fetch(`/Data/History?minutes=${currentDuration}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                const data = await res.json();
+                console.log("History 成功:", data);
+
+                const values = data.map(d => getVal(d, currentMetric) || 0);
+                const rawTimes = data.map(d => new Date(d.time || d.Time || d.CreatedAt));
+
+                const labels = [];
+                let lastBucketKey = "";
+
+                for (const dt of rawTimes) {
+                    const y = dt.getFullYear();
+                    const m = String(dt.getMonth() + 1).padStart(2, '0');
+                    const d = String(dt.getDate()).padStart(2, '0');
+                    const hh = String(dt.getHours()).padStart(2, '0');
+                    const bucketMinute = Math.floor(dt.getMinutes() / 5) * 5;
+                    const mm = String(bucketMinute).padStart(2, '0');
+
+                    const bucketKey = `${y}-${m}-${d} ${hh}:${mm}`;
+
+                    if (bucketKey !== lastBucketKey) {
+                        labels.push(`${hh}:${mm}`);
+                        lastBucketKey = bucketKey;
+                    } else {
+                        labels.push('');
+                    }
+                }
+
+                let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, COLORS[currentMetric] + '50');
+                gradient.addColorStop(1, COLORS[currentMetric] + '00');
+
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: currentMetric.toUpperCase(),
+                            data: values,
+                            borderColor: COLORS[currentMetric],
+                            backgroundColor: gradient,
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(context) {
+                                        const idx = context[0].dataIndex;
+                                        return rawTimes[idx].toLocaleTimeString('zh-TW', {
+                                            hour12: true,
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            second: '2-digit'
+                                        });
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: {
+                                    color: '#888',
+                                    autoSkip: false,
+                                    maxRotation: 0,
+                                    minRotation: 0
+                                }
+                            },
+                            y: {
+                                border: { display: false },
+                                grid: { color: 'rgba(200,200,200,0.1)' }
+                            }
+                        },
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("歷史數據載入失敗:", e);
+            }
+        }
+
+        function startHistoryAutoRefresh() {
+            if (historyRefreshTimer) {
+                clearInterval(historyRefreshTimer);
+            }
+
+            historyRefreshTimer = setInterval(() => {
+                console.log("⏰ 圖表每 10 分鐘自動更新一次");
+                loadHistory();
+            }, 10 * 60 * 1000);
+        }
+
+        function changeMetric(m, btn) {
+            currentMetric = m;
+            document.querySelectorAll('.btn-toggle').forEach(b => {
+                if (b.parentElement === btn.parentElement) b.classList.remove('active');
+            });
+            btn.classList.add('active');
+            loadHistory();
+        }
+
+        function changeDuration(d, btn) {
+            currentDuration = d;
+            document.querySelectorAll('.btn-toggle').forEach(b => {
+                if (b.parentElement === btn.parentElement) b.classList.remove('active');
+            });
+            btn.classList.add('active');
+            loadHistory();
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            body.setAttribute('data-theme', body.getAttribute('data-theme') === 'dark' ? '' : 'dark');
+            loadHistory();
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log("✅ DOMContentLoaded 已觸發");
+            await loadLatest();
+            await loadHistory();
+            startSignalR();
+            startHistoryAutoRefresh();
+        });
+    </script>
+</body>
+</html>
