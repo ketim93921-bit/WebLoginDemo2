@@ -1,4 +1,5 @@
 ﻿@model WebLoginDemo2.Models.LoginViewModel
+
 @{
     Layout = null;
 }
@@ -16,7 +17,7 @@
 
     <style>
         :root {
-            --primary: #10b981; /* Emerald 500 */
+            --primary: #10b981;
             --primary-dark: #047857;
             --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
             --glass: rgba(255, 255, 255, 0.9);
@@ -47,7 +48,6 @@
             min-height: 600px;
         }
 
-        /* 左側表單區 */
         .form-side {
             padding: 48px;
             display: flex;
@@ -105,7 +105,7 @@
 
         .input-field {
             width: 100%;
-            padding: 12px 16px 12px 42px; /* 左邊留給 icon */
+            padding: 12px 16px 12px 42px;
             border: 1px solid #e2e8f0;
             border-radius: 12px;
             font-size: 14px;
@@ -128,21 +128,6 @@
             font-size: 16px;
         }
 
-        .captcha-row {
-            display: grid;
-            grid-template-columns: 1fr 120px;
-            gap: 12px;
-        }
-
-        .captcha-img {
-            height: 46px;
-            width: 100%;
-            border-radius: 12px;
-            cursor: pointer;
-            border: 1px solid #e2e8f0;
-            object-fit: cover;
-        }
-
         .btn-submit {
             width: 100%;
             padding: 14px;
@@ -162,9 +147,8 @@
                 transform: translateY(-1px);
             }
 
-        /* 右側視覺區 */
         .visual-side {
-            background: linear-gradient(rgba(4, 120, 87, 0.85), rgba(6, 78, 59, 0.9)), url('https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?auto=format&fit=crop&q=80'); /* 範例圖 */
+            background: linear-gradient(rgba(4, 120, 87, 0.85), rgba(6, 78, 59, 0.9)), url('https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?auto=format&fit=crop&q=80');
             background-size: cover;
             background-position: center;
             position: relative;
@@ -219,7 +203,6 @@
             line-height: 1.6;
         }
 
-        /* 響應式 */
         @@media (max-width: 768px) {
             .login-wrapper {
                 grid-template-columns: 1fr;
@@ -229,14 +212,21 @@
             .visual-side {
                 display: none;
             }
+
+            .form-side {
+                padding: 32px 24px;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="login-wrapper">
         <div class="form-side">
             <div class="brand-logo">
-                <div class="logo-icon"><i class="bi bi-cpu-fill"></i></div>
+                <div class="logo-icon">
+                    <i class="bi bi-cpu-fill"></i>
+                </div>
                 <span>AgriTech Core</span>
             </div>
 
@@ -245,7 +235,9 @@
                 <p>請輸入您的帳號密碼以存取監控儀表板</p>
             </div>
 
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small border-0 bg-danger-subtle text-danger mb-4" role="alert"></div>
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-danger py-2 small border-0 bg-danger-subtle text-danger mb-4"
+                 role="alert"></div>
 
             <form asp-action="Login" asp-controller="Auth" method="post">
                 @Html.AntiForgeryToken()
@@ -253,25 +245,31 @@
                 <div class="input-group-custom">
                     <label asp-for="UserName">帳號</label>
                     <i class="bi bi-person field-icon"></i>
-                    <input asp-for="UserName" class="input-field" placeholder="請輸入使用者帳號" autocomplete="username" />
-                    <span asp-validation-for="UserName" class="text-danger small mt-1 d-block"></span>
+                    <input asp-for="UserName"
+                           class="input-field"
+                           placeholder="請輸入使用者帳號"
+                           autocomplete="username" />
+                    <span asp-validation-for="UserName"
+                          class="text-danger small mt-1 d-block"></span>
                 </div>
 
                 <div class="input-group-custom">
                     <label asp-for="Password">密碼</label>
                     <i class="bi bi-lock field-icon"></i>
-                    <input asp-for="Password" class="input-field" placeholder="請輸入密碼" autocomplete="current-password" />
-                    <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
+                    <input asp-for="Password"
+                           class="input-field"
+                           placeholder="請輸入密碼"
+                           autocomplete="current-password" />
+                    <span asp-validation-for="Password"
+                          class="text-danger small mt-1 d-block"></span>
                 </div>
-
-           
 
                 <button type="submit" class="btn-submit">
                     登入系統 <i class="bi bi-arrow-right ms-2"></i>
                 </button>
 
                 <div class="text-center mt-4">
-                    <span class="text-muted small">忘記密碼？請聯繫系統管理員</span>
+                    <span class="text-muted small">僅限系統管理員登入</span>
                 </div>
             </form>
         </div>
@@ -280,9 +278,12 @@
             <div class="visual-content">
                 <div class="glass-card">
                     <div class="stat-row">
-                        <span class="stat-label"><i class="bi bi-broadcast me-1"></i>系統狀態</span>
+                        <span class="stat-label">
+                            <i class="bi bi-broadcast me-1"></i>系統狀態
+                        </span>
                         <span class="badge bg-success bg-opacity-75">Online</span>
                     </div>
+
                     <div class="stat-row mt-2">
                         <span class="stat-label">即時監測點</span>
                         <span class="stat-val">12 Active</span>
@@ -292,6 +293,7 @@
                 <div class="visual-title">
                     智慧數據驅動<br>精準農業未來
                 </div>
+
                 <div class="visual-desc">
                     透過 IoT 感測技術與雲端分析，全天候監控溫室環境，讓作物生長在最佳狀態。
                 </div>
@@ -302,6 +304,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
-
 </body>
 </html>
