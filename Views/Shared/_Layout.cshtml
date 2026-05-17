@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WebLoginDemo2</title>
+
+    <!-- 全站共用的 CSS（Bootstrap + 你自己的 site.css） -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WebLoginDemo2.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <!-- 上方導覽列：目前主要是專案名稱 + 一個連回登入頁的按鈕 -->
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <!-- 點專案名稱回 Home（這裡我等一下會建議你 Redirect 到 Dashboard 或 Login） -->
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    WebLoginDemo2
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
+                    <ul class="navbar-nav">
+                        <!-- 可以依需求增加其他連結。暫時只放一個「登入」 -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Login">
+                                登入
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- 內文：各 View 的內容會渲染在這裡 -->
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- 底部版權區，可以保留也可以自行改掉 -->
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - WebLoginDemo2
+        </div>
+    </footer>
+
+    <!-- 共用 JS（jQuery + Bootstrap + 你的 site.js） -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- 每個頁面如果有額外 script，可以用 section Scripts{...} 插進來 -->
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
