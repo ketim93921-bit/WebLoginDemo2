@@ -388,6 +388,33 @@
                         <button id="relay6OnBtn" class="btn-toggle flex-fill" onclick="controlRelay(6, true)">開啟</button>
                         <button id="relay6OffBtn" class="btn-toggle flex-fill" onclick="controlRelay(6, false)">關閉</button>
                     </div>
+
+                    <div class="mt-3">
+                        <label class="unit-label mb-2 d-block">Relay6 定時控制</label>
+
+                        <div class="d-flex gap-2">
+                            <select id="relay6TimerUnit" class="btn-toggle flex-fill">
+                                <option value="1">15 分鐘</option>
+                                <option value="2">30 分鐘</option>
+                                <option value="3">45 分鐘</option>
+                                <option value="4">60 分鐘</option>
+                                <option value="6">90 分鐘</option>
+                                <option value="8">120 分鐘</option>
+                            </select>
+
+                            <button id="relay6TimerBtn"
+                                    class="btn-toggle flex-fill"
+                                    onclick="controlRelay6Timer()">
+                                啟動定時
+                            </button>
+                        </div>
+
+                        <button id="relay6CancelTimerBtn"
+                                class="btn-toggle w-100 mt-2"
+                                onclick="cancelRelay6Timer()">
+                            取消定時並關閉
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -659,6 +686,69 @@
             } finally {
                 if (onBtn) onBtn.disabled = false;
                 if (offBtn) offBtn.disabled = false;
+            }
+        }
+
+        async function controlRelay6Timer() {
+            const select = document.getElementById('relay6TimerUnit');
+            const timerBtn = document.getElementById('relay6TimerBtn');
+            const cancelBtn = document.getElementById('relay6CancelTimerBtn');
+
+            if (!select) return;
+
+            const unitCount = Number(select.value);
+
+            if (timerBtn) timerBtn.disabled = true;
+            if (cancelBtn) cancelBtn.disabled = true;
+
+            try {
+                const res = await fetch(`/api/control/relay6/timer/${unitCount}`, {
+                    method: 'POST'
+                });
+
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(text);
+                }
+
+                updateRelayUI(6, true);
+
+                alert(`Relay6 已啟動定時 ${unitCount * 15} 分鐘`);
+            } catch (err) {
+                console.error("❌ Relay6 定時控制失敗:", err);
+                alert("Relay6 定時控制失敗，請檢查後端與 MQTT 連線。");
+            } finally {
+                if (timerBtn) timerBtn.disabled = false;
+                if (cancelBtn) cancelBtn.disabled = false;
+            }
+        }
+
+        async function cancelRelay6Timer() {
+            const timerBtn = document.getElementById('relay6TimerBtn');
+            const cancelBtn = document.getElementById('relay6CancelTimerBtn');
+
+            if (timerBtn) timerBtn.disabled = true;
+            if (cancelBtn) cancelBtn.disabled = true;
+
+            try {
+                const res = await fetch('/api/control/relay6/timer/0', {
+                    method: 'POST'
+                });
+
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(text);
+                }
+
+                updateRelayUI(6, false);
+
+                alert("Relay6 定時已取消並關閉");
+            } catch (err) {
+                console.error("❌ Relay6 取消定時失敗:", err);
+                alert("Relay6 取消定時失敗，請檢查後端與 MQTT 連線。");
+            } finally {
+                if (timerBtn) timerBtn.disabled = false;
+                if (cancelBtn) cancelBtn.disabled = false;
             }
         }
 

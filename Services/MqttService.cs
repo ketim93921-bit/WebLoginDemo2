@@ -27,6 +27,11 @@ namespace WebLoginDemo2.Services
         private const string Relay4CommandTopic = "greenhouse/set/relay4";
         private const string Relay5CommandTopic = "greenhouse/set/relay5";
         private const string Relay6CommandTopic = "greenhouse/set/relay6";
+
+        // Relay6 定時控制 Topic
+        // payload: 1 = 15分鐘, 2 = 30分鐘, 4 = 60分鐘, 0 = 取消並關閉
+        private const string Relay6TimerTopic = "greenhouse/set/relay6TimerUnit";
+
         private const string StepperCommandTopic = "greenhouse/set/stepper";
 
         private const string MqttServerIp = "broker.hivemq.com";
@@ -45,6 +50,7 @@ namespace WebLoginDemo2.Services
             return new SensorData
             {
                 Time = _latestData.Time,
+
                 Temp = _latestData.Temp,
                 Humidity = _latestData.Humidity,
                 Soil = _latestData.Soil,
@@ -380,8 +386,52 @@ namespace WebLoginDemo2.Services
             );
         }
 
-        // 保留舊方法，避免 ControlController / LineWebhookController 還沒改時編譯錯誤
-        // 這裡先把「風扇」對應成 Relay1
+        // ================================
+        // Relay6 定時控制
+        // unitCount: 1 = 15分鐘, 2 = 30分鐘, 4 = 60分鐘
+        // unitCount: 0 = 取消定時並關閉 Relay6
+        // ================================
+        public async Task PublishRelay6TimerCommandAsync(
+            int unitCount,
+            CancellationToken cancellationToken = default)
+        {
+            if (unitCount < 0)
+                throw new ArgumentOutOfRangeException(nameof(unitCount), "Relay6 定時單位不能小於 0。");
+
+            if (unitCount > 96)
+                throw new ArgumentOutOfRangeException(nameof(unitCount), "Relay6 定時最多 96 單位，也就是 24 小時。");
+
+            if (_mqttClient == null)
+                throw new InvalidOperationException("MQTT Client 尚未初始化");
+
+            if (!_mqttClient.IsConnected)
+                await ConnectAsync(cancellationToken);
+
+            string payload = unitCount.ToString();
+
+            var message = new MqttApplicationMessageBuilder()
+                .WithTopic(Relay6TimerTopic)
+                .WithPayload(payload)
+                .WithRetainFlag(false)
+                .Build();
+
+            await _mqttClient.PublishAsync(message, cancellationToken);
+
+            _latestData.Relay6 = unitCount > 0;
+            _latestData.Time = DateTime.Now;
+
+            await _hubContext.Clients.Group("Dashboard")
+                .SendAsync("ReceiveSensorData", _latestData, cancellationToken);
+
+            _logger.LogInformation(
+                "✅ 已發送 Relay6 定時指令 Topic={Topic}, Unit={Unit}, Minutes={Minutes}",
+                Relay6TimerTopic,
+                unitCount,
+                unitCount * 15
+            );
+        }
+
+        // 保留舊方法，讓舊的 fan/on、fan/off 還能控制 Relay1
         public async Task PublishFanCommandAsync(
             bool on,
             CancellationToken cancellationToken = default)

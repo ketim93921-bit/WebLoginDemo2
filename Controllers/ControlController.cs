@@ -52,6 +52,62 @@ namespace WebLoginDemo2.Controllers
         }
 
         // ==============================
+        // Relay6 定時控制 API
+        // POST /api/control/relay6/timer/1  = 15 分鐘
+        // POST /api/control/relay6/timer/2  = 30 分鐘
+        // POST /api/control/relay6/timer/4  = 60 分鐘
+        // POST /api/control/relay6/timer/0  = 取消定時並關閉
+        // ==============================
+        [HttpPost("relay6/timer/{unitCount:int}")]
+        public async Task<IActionResult> Relay6Timer(int unitCount)
+        {
+            if (unitCount < 0)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Relay6 定時單位不能小於 0。"
+                });
+            }
+
+            if (unitCount > 96)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Relay6 定時最多 96 單位，也就是 24 小時。"
+                });
+            }
+
+            try
+            {
+                await _mqttService.PublishRelay6TimerCommandAsync(unitCount);
+
+                return Ok(new
+                {
+                    success = true,
+                    device = "Relay6",
+                    timerUnit = unitCount,
+                    minutes = unitCount * 15,
+                    state = unitCount > 0 ? "ON" : "OFF",
+                    message = unitCount > 0
+                        ? $"Relay6 已啟動定時 {unitCount * 15} 分鐘"
+                        : "Relay6 定時已取消並關閉"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    device = "Relay6",
+                    message = "Relay6 定時控制失敗",
+                    detail = ex.Message
+                });
+            }
+        }
+
+        // ==============================
         // Stepper 步進馬達控制 API
         // POST /api/control/stepper/on
         // POST /api/control/stepper/off
