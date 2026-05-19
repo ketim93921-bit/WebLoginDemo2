@@ -122,85 +122,101 @@ public class LineWebhookController : ControllerBase
             case "D6":
             case "Relay6控制":
             case "D6控制":
+            case "生長燈":
+            case "生長燈控制":
                 await _line.ReplyMessagesAsync(replyToken, BuildRelay6ControlReply());
                 break;
 
             case "Relay6開":
             case "D6開":
+            case "生長燈開":
                 await _mqtt.PublishRelayCommandAsync(6, true);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6 / D6", true));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("生長燈", true));
                 break;
 
             case "Relay6關":
             case "D6關":
+            case "生長燈關":
                 await _mqtt.PublishRelayCommandAsync(6, false);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6 / D6", false));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("生長燈", false));
                 break;
 
             case "Relay6定時10":
             case "D6定時10":
+            case "生長燈定時10":
                 await _mqtt.PublishRelay6TimerCommandAsync(1);
-                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("Relay6 / D6", 10));
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("生長燈", 10));
                 break;
 
             case "Relay6定時20":
             case "D6定時20":
+            case "生長燈定時20":
                 await _mqtt.PublishRelay6TimerCommandAsync(2);
-                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("Relay6 / D6", 20));
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("生長燈", 20));
                 break;
 
             case "Relay6定時30":
             case "D6定時30":
+            case "生長燈定時30":
                 await _mqtt.PublishRelay6TimerCommandAsync(3);
-                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("Relay6 / D6", 30));
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("生長燈", 30));
                 break;
 
             case "Relay6取消定時":
             case "D6取消定時":
+            case "生長燈取消定時":
                 await _mqtt.PublishRelay6TimerCommandAsync(0);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6 / D6", false));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("生長燈", false));
                 break;
 
             case "步進馬達":
             case "馬達":
             case "步進馬達控制":
+            case "液肥":
+            case "液肥控制":
                 await _line.ReplyMessagesAsync(replyToken, BuildStepperControlReply());
                 break;
 
             case "步進馬達開":
             case "馬達開":
+            case "液肥開":
                 await _mqtt.PublishStepperCommandAsync(true);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("步進馬達", true));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("液肥", true));
                 break;
 
             case "步進馬達關":
             case "馬達關":
+            case "液肥關":
                 await _mqtt.PublishStepperCommandAsync(false);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("步進馬達", false));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("液肥", false));
                 break;
 
             case "步進馬達定時10":
             case "馬達定時10":
+            case "液肥定時10":
                 await _mqtt.PublishStepperTimerCommandAsync(1);
-                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("步進馬達", 10));
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("液肥", 10));
                 break;
 
             case "步進馬達定時20":
             case "馬達定時20":
+            case "液肥定時20":
                 await _mqtt.PublishStepperTimerCommandAsync(2);
-                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("步進馬達", 20));
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("液肥", 20));
                 break;
 
             case "步進馬達定時30":
             case "馬達定時30":
+            case "液肥定時30":
                 await _mqtt.PublishStepperTimerCommandAsync(3);
-                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("步進馬達", 30));
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("液肥", 30));
                 break;
 
             case "步進馬達取消定時":
             case "馬達取消定時":
+            case "液肥取消定時":
                 await _mqtt.PublishStepperTimerCommandAsync(0);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("步進馬達", false));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("液肥", false));
                 break;
 
             case "綁定":
@@ -233,32 +249,32 @@ public class LineWebhookController : ControllerBase
 
             case "action=relay6_on":
                 await _mqtt.PublishRelayCommandAsync(6, true);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6 / D6", true));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("生長燈", true));
                 break;
 
             case "action=relay6_off":
                 await _mqtt.PublishRelayCommandAsync(6, false);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6 / D6", false));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("生長燈", false));
                 break;
 
             case "action=relay6_timer_1":
                 await _mqtt.PublishRelay6TimerCommandAsync(1);
-                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("Relay6 / D6", 10));
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("生長燈", 10));
                 break;
 
             case "action=relay6_timer_2":
                 await _mqtt.PublishRelay6TimerCommandAsync(2);
-                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("Relay6 / D6", 20));
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("生長燈", 20));
                 break;
 
             case "action=relay6_timer_3":
                 await _mqtt.PublishRelay6TimerCommandAsync(3);
-                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("Relay6 / D6", 30));
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("生長燈", 30));
                 break;
 
             case "action=relay6_timer_cancel":
                 await _mqtt.PublishRelay6TimerCommandAsync(0);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6 / D6", false));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("生長燈", false));
                 break;
 
             case "action=stepper_menu":
@@ -267,32 +283,32 @@ public class LineWebhookController : ControllerBase
 
             case "action=stepper_on":
                 await _mqtt.PublishStepperCommandAsync(true);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("步進馬達", true));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("液肥", true));
                 break;
 
             case "action=stepper_off":
                 await _mqtt.PublishStepperCommandAsync(false);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("步進馬達", false));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("液肥", false));
                 break;
 
             case "action=stepper_timer_1":
                 await _mqtt.PublishStepperTimerCommandAsync(1);
-                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("步進馬達", 10));
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("液肥", 10));
                 break;
 
             case "action=stepper_timer_2":
                 await _mqtt.PublishStepperTimerCommandAsync(2);
-                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("步進馬達", 20));
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("液肥", 20));
                 break;
 
             case "action=stepper_timer_3":
                 await _mqtt.PublishStepperTimerCommandAsync(3);
-                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("步進馬達", 30));
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("液肥", 30));
                 break;
 
             case "action=stepper_timer_cancel":
                 await _mqtt.PublishStepperTimerCommandAsync(0);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("步進馬達", false));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("液肥", false));
                 break;
 
             case "action=bind":
@@ -424,9 +440,9 @@ public class LineWebhookController : ControllerBase
                             BuildLargeInfoRow("濕度", $"{latest.Humidity:F1}%"),
                             BuildLargeInfoRow("土壤數值", $"{latest.Soil:F0}"),
                             BuildLargeInfoRow("土壤狀態", TranslateSoilState(latest.SoilState)),
-                            BuildLargeInfoRow("Relay5 / D5", OnOffText(latest.Relay5)),
-                            BuildLargeInfoRow("Relay6 / D6", OnOffText(latest.Relay6)),
-                            BuildLargeInfoRow("步進馬達", OnOffText(latest.Stepper)),
+                            BuildLargeInfoRow("滴灌", OnOffText(latest.Relay5)),
+                            BuildLargeInfoRow("生長燈", OnOffText(latest.Relay6)),
+                            BuildLargeInfoRow("液肥", OnOffText(latest.Stepper)),
                             BuildLargeInfoRow("更新時間", $"{latest.Time:HH:mm:ss}")
                         }
                     },
@@ -515,9 +531,9 @@ public class LineWebhookController : ControllerBase
                                 color = "#6366F1",
                                 action = new {
                                     type = "postback",
-                                    label = "Relay6 / D6 控制",
+                                    label = "生長燈控制",
                                     data = "action=relay6_menu",
-                                    displayText = "Relay6 控制"
+                                    displayText = "生長燈控制"
                                 }
                             },
                             new {
@@ -527,9 +543,9 @@ public class LineWebhookController : ControllerBase
                                 color = "#16A34A",
                                 action = new {
                                     type = "postback",
-                                    label = "步進馬達控制",
+                                    label = "液肥控制",
                                     data = "action=stepper_menu",
-                                    displayText = "步進馬達控制"
+                                    displayText = "液肥控制"
                                 }
                             }
                         }
@@ -546,7 +562,7 @@ public class LineWebhookController : ControllerBase
             new
             {
                 type = "flex",
-                altText = "Relay6 / D6 控制",
+                altText = "生長燈控制",
                 contents = new
                 {
                     type = "bubble",
@@ -560,7 +576,7 @@ public class LineWebhookController : ControllerBase
                         {
                             new {
                                 type = "text",
-                                text = "Relay6 / D6 控制",
+                                text = "生長燈控制",
                                 weight = "bold",
                                 size = "3xl",
                                 align = "center",
@@ -582,12 +598,12 @@ public class LineWebhookController : ControllerBase
                         spacing = "md",
                         contents = new object[]
                         {
-                            BuildPostbackButton("開啟", "action=relay6_on", "Relay6開", "#16A34A"),
-                            BuildPostbackButton("關閉", "action=relay6_off", "Relay6關"),
-                            BuildPostbackButton("定時 10 分鐘", "action=relay6_timer_1", "Relay6定時10", "#2563EB"),
-                            BuildPostbackButton("定時 20 分鐘", "action=relay6_timer_2", "Relay6定時20", "#2563EB"),
-                            BuildPostbackButton("定時 30 分鐘", "action=relay6_timer_3", "Relay6定時30", "#2563EB"),
-                            BuildPostbackButton("取消定時並關閉", "action=relay6_timer_cancel", "Relay6取消定時"),
+                            BuildPostbackButton("開啟", "action=relay6_on", "生長燈開", "#16A34A"),
+                            BuildPostbackButton("關閉", "action=relay6_off", "生長燈關"),
+                            BuildPostbackButton("定時 10 分鐘", "action=relay6_timer_1", "生長燈定時10", "#2563EB"),
+                            BuildPostbackButton("定時 20 分鐘", "action=relay6_timer_2", "生長燈定時20", "#2563EB"),
+                            BuildPostbackButton("定時 30 分鐘", "action=relay6_timer_3", "生長燈定時30", "#2563EB"),
+                            BuildPostbackButton("取消定時並關閉", "action=relay6_timer_cancel", "生長燈取消定時"),
                             BuildPostbackButton("回設備控制", "action=control_menu", "設備控制")
                         }
                     }
@@ -603,7 +619,7 @@ public class LineWebhookController : ControllerBase
             new
             {
                 type = "flex",
-                altText = "步進馬達控制",
+                altText = "液肥控制",
                 contents = new
                 {
                     type = "bubble",
@@ -617,7 +633,7 @@ public class LineWebhookController : ControllerBase
                         {
                             new {
                                 type = "text",
-                                text = "步進馬達控制",
+                                text = "液肥控制",
                                 weight = "bold",
                                 size = "3xl",
                                 align = "center",
@@ -639,12 +655,12 @@ public class LineWebhookController : ControllerBase
                         spacing = "md",
                         contents = new object[]
                         {
-                            BuildPostbackButton("啟動", "action=stepper_on", "步進馬達開", "#16A34A"),
-                            BuildPostbackButton("關閉", "action=stepper_off", "步進馬達關"),
-                            BuildPostbackButton("定時 10 分鐘", "action=stepper_timer_1", "步進馬達定時10", "#2563EB"),
-                            BuildPostbackButton("定時 20 分鐘", "action=stepper_timer_2", "步進馬達定時20", "#2563EB"),
-                            BuildPostbackButton("定時 30 分鐘", "action=stepper_timer_3", "步進馬達定時30", "#2563EB"),
-                            BuildPostbackButton("取消定時並關閉", "action=stepper_timer_cancel", "步進馬達取消定時"),
+                            BuildPostbackButton("啟動", "action=stepper_on", "液肥開", "#16A34A"),
+                            BuildPostbackButton("關閉", "action=stepper_off", "液肥關"),
+                            BuildPostbackButton("定時 10 分鐘", "action=stepper_timer_1", "液肥定時10", "#2563EB"),
+                            BuildPostbackButton("定時 20 分鐘", "action=stepper_timer_2", "液肥定時20", "#2563EB"),
+                            BuildPostbackButton("定時 30 分鐘", "action=stepper_timer_3", "液肥定時30", "#2563EB"),
+                            BuildPostbackButton("取消定時並關閉", "action=stepper_timer_cancel", "液肥取消定時"),
                             BuildPostbackButton("回設備控制", "action=control_menu", "設備控制")
                         }
                     }
