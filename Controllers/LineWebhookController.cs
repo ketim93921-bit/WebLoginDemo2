@@ -800,7 +800,7 @@ public class LineWebhookController : ControllerBase
                             BuildPostbackButton("定時 10 分鐘", "action=stepper_timer_1", "液肥定時10", "#2563EB"),
                             BuildPostbackButton("定時 20 分鐘", "action=stepper_timer_2", "液肥定時20", "#2563EB"),
                             BuildPostbackButton("定時 30 分鐘", "action=stepper_timer_3", "液肥定時30", "#2563EB"),
-                            BuildPostbackButton("定時 40 分鐘", "action=stepper_timer_4", "液肥定时40", "#2563EB"),
+                            BuildPostbackButton("定時 40 分鐘", "action=stepper_timer_4", "液肥定時40", "#2563EB"),
                             BuildPostbackButton("定時 50 分鐘", "action=stepper_timer_5", "液肥定時50", "#2563EB"),
                             BuildPostbackButton("定時 60 分鐘", "action=stepper_timer_6", "液肥定時60", "#2563EB"),
                             BuildPostbackButton("取消定時並關閉", "action=stepper_timer_cancel", "液肥取消定時", "#6B7280"),

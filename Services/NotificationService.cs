@@ -8,7 +8,6 @@ namespace WebLoginDemo2.Services
     public class NotificationService
     {
         private readonly ILogger<NotificationService> _logger;
-        private readonly IHttpClientFactory _httpFactory;
         private readonly IConfiguration _config;
         private readonly LineBotService _lineBot;
 
@@ -18,12 +17,10 @@ namespace WebLoginDemo2.Services
 
         public NotificationService(
             ILogger<NotificationService> logger,
-            IHttpClientFactory httpFactory,
             IConfiguration config,
             LineBotService lineBot)
         {
             _logger = logger;
-            _httpFactory = httpFactory;
             _config = config;
             _lineBot = lineBot;
         }
@@ -51,7 +48,10 @@ namespace WebLoginDemo2.Services
         }
 
         // ================= LINE 大字異常警告卡 =================
-        public async Task SendLineAlertCardAsync(string title, string detail, bool showControlButton = true)
+        public async Task SendLineAlertCardAsync(
+            string title,
+            string detail,
+            bool showControlButton = true)
         {
             var userId = _config["Line:AdminUserId"];
 
@@ -138,7 +138,7 @@ namespace WebLoginDemo2.Services
                                             action = new
                                             {
                                                 type = "message",
-                                                label = "查看農場狀態",
+                                                label = "查看即時狀態",
                                                 text = "農場狀態"
                                             }
                                         },
@@ -166,7 +166,7 @@ namespace WebLoginDemo2.Services
                                             action = new
                                             {
                                                 type = "message",
-                                                label = "查看農場狀態",
+                                                label = "查看即時狀態",
                                                 text = "農場狀態"
                                             }
                                         }
@@ -191,7 +191,8 @@ namespace WebLoginDemo2.Services
             var senderEmail = _config["Email:SenderEmail"];
             var appPassword = _config["Email:AppPassword"];
 
-            if (string.IsNullOrWhiteSpace(senderEmail) || string.IsNullOrWhiteSpace(appPassword))
+            if (string.IsNullOrWhiteSpace(senderEmail) ||
+                string.IsNullOrWhiteSpace(appPassword))
             {
                 _logger.LogError("❌ Email 設定缺失：請在 appsettings.json 填 Email:SenderEmail 與 Email:AppPassword");
                 return;

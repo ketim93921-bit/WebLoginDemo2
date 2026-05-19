@@ -16,7 +16,19 @@ namespace WebLoginDemo2.Services
         // 對應新版 Arduino 程式
         // ================================
         private const string MqttTopic = "esp8266/sensor";
+
+        // D6 生長燈控制 Topic
+        // Payload:
+        // ON  = 立即開啟
+        // OFF = 立即關閉
+        // 1~6 = 10~60 分鐘定時
         private const string Relay6CommandTopic = "esp8266/relay/d6";
+
+        // Stepper 液肥控制 Topic
+        // Payload:
+        // ON  = 立即啟動
+        // OFF = 立即停止
+        // 1~6 = 10~60 分鐘定時
         private const string StepperCommandTopic = "esp8266/stepper";
 
         private const string MqttServerIp = "broker.hivemq.com";
@@ -25,7 +37,7 @@ namespace WebLoginDemo2.Services
         // Arduino 新程式：1 單位 = 10 分鐘
         private const int TimerUnitMinutes = 10;
 
-        // Arduino 土壤門檻：soil > 950 啟動 D5
+        // Arduino 土壤門檻：soil > 950 啟動滴灌
         private const int DefaultSoilLimit = 950;
 
         // ================================
@@ -66,9 +78,9 @@ namespace WebLoginDemo2.Services
                 $"濕度：{data.Humidity:F1}%\n" +
                 $"土壤數值：{data.Soil:F0}\n" +
                 $"土壤狀態：{data.SoilState}\n" +
-                $"Relay5 / D5：{OnOffText(data.Relay5)}\n" +
-                $"Relay6 / D6：{OnOffText(data.Relay6)}\n" +
-                $"步進馬達：{OnOffText(data.Stepper)}\n" +
+                $"滴灌：{OnOffText(data.Relay5)}\n" +
+                $"生長燈：{OnOffText(data.Relay6)}\n" +
+                $"液肥：{OnOffText(data.Stepper)}\n" +
                 $"更新時間：{data.Time:yyyy-MM-dd HH:mm:ss}";
         }
 
@@ -243,7 +255,7 @@ namespace WebLoginDemo2.Services
                 _latestData = data;
 
                 _logger.LogInformation(
-                    "[DATA] Temp={Temp:F1}, Humidity={Humidity:F1}, Soil={Soil:F0}, SoilState={SoilState}, Relay5={Relay5}, Relay6={Relay6}, Stepper={Stepper}",
+                    "[DATA] Temp={Temp:F1}, Humidity={Humidity:F1}, Soil={Soil:F0}, SoilState={SoilState}, 滴灌={Relay5}, 生長燈={Relay6}, 液肥={Stepper}",
                     data.Temp,
                     data.Humidity,
                     data.Soil,
@@ -267,8 +279,8 @@ namespace WebLoginDemo2.Services
         }
 
         // ================================
-        // Relay 控制
-        // 新 Arduino 目前只有 Relay6 / D6 支援遠端手動控制
+        // 生長燈手動控制
+        // Relay6 / D6
         // ================================
         public async Task PublishRelayCommandAsync(
             int relayNumber,
@@ -305,27 +317,32 @@ namespace WebLoginDemo2.Services
                 .SendAsync("ReceiveSensorData", _latestData, cancellationToken);
 
             _logger.LogInformation(
-                "✅ 已發送 Relay6 / D6 控制指令 Topic={Topic}, Payload={Payload}",
+                "✅ 已發送生長燈控制指令 Topic={Topic}, Payload={Payload}",
                 Relay6CommandTopic,
                 payload
             );
         }
 
         // ================================
-        // Relay6 / D6 定時控制
-        // 新 Arduino：1 單位 = 10 分鐘
-        // unitCount = 0：取消定時並關閉
-        // unitCount > 0：先送數字設定時間，再送 ON 啟動
+        // 生長燈定時控制
+        // Relay6 / D6
+        //
+        // 重要：
+        // 這裡只送數字 1~6
+        // 不再額外送 ON
+        //
+        // 因為 ESP8266 收到數字會自行啟動定時
+        // 若再送 ON，會覆蓋 timer 變成常亮
         // ================================
         public async Task PublishRelay6TimerCommandAsync(
             int unitCount,
             CancellationToken cancellationToken = default)
         {
             if (unitCount < 0)
-                throw new ArgumentOutOfRangeException(nameof(unitCount), "Relay6 定時單位不能小於 0。");
+                throw new ArgumentOutOfRangeException(nameof(unitCount), "生長燈定時單位不能小於 0。");
 
             if (unitCount > 144)
-                throw new ArgumentOutOfRangeException(nameof(unitCount), "Relay6 定時最多 144 單位，也就是 24 小時。");
+                throw new ArgumentOutOfRangeException(nameof(unitCount), "生長燈定時最多 144 單位，也就是 24 小時。");
 
             if (_mqttClient == null)
                 throw new InvalidOperationException("MQTT Client 尚未初始化");
@@ -347,23 +364,13 @@ namespace WebLoginDemo2.Services
             }
             else
             {
-                var setUnitMessage = new MqttApplicationMessageBuilder()
+                var timerMessage = new MqttApplicationMessageBuilder()
                     .WithTopic(Relay6CommandTopic)
                     .WithPayload(unitCount.ToString())
                     .WithRetainFlag(false)
                     .Build();
 
-                await _mqttClient.PublishAsync(setUnitMessage, cancellationToken);
-
-                await Task.Delay(200, cancellationToken);
-
-                var onMessage = new MqttApplicationMessageBuilder()
-                    .WithTopic(Relay6CommandTopic)
-                    .WithPayload("ON")
-                    .WithRetainFlag(false)
-                    .Build();
-
-                await _mqttClient.PublishAsync(onMessage, cancellationToken);
+                await _mqttClient.PublishAsync(timerMessage, cancellationToken);
 
                 _latestData.Relay6 = true;
             }
@@ -374,14 +381,14 @@ namespace WebLoginDemo2.Services
                 .SendAsync("ReceiveSensorData", _latestData, cancellationToken);
 
             _logger.LogInformation(
-                "✅ 已發送 Relay6 / D6 定時指令 Topic={Topic}, Unit={Unit}, Minutes={Minutes}",
+                "✅ 已發送生長燈定時指令 Topic={Topic}, Unit={Unit}, Minutes={Minutes}",
                 Relay6CommandTopic,
                 unitCount,
                 unitCount * TimerUnitMinutes
             );
         }
 
-        // 保留舊方法，舊 fan/on, fan/off 對應到 Relay6 / D6
+        // 保留舊方法，舊 fan/on, fan/off 對應到生長燈
         public async Task PublishFanCommandAsync(
             bool on,
             CancellationToken cancellationToken = default)
@@ -390,7 +397,8 @@ namespace WebLoginDemo2.Services
         }
 
         // ================================
-        // Stepper 手動控制
+        // 液肥手動控制
+        // Stepper
         // ================================
         public async Task PublishStepperCommandAsync(
             bool on,
@@ -419,27 +427,29 @@ namespace WebLoginDemo2.Services
                 .SendAsync("ReceiveSensorData", _latestData, cancellationToken);
 
             _logger.LogInformation(
-                "✅ 已發送步進馬達控制指令 Topic={Topic}, Payload={Payload}",
+                "✅ 已發送液肥控制指令 Topic={Topic}, Payload={Payload}",
                 StepperCommandTopic,
                 payload
             );
         }
 
         // ================================
-        // Stepper 定時控制
-        // 新 Arduino：1 單位 = 10 分鐘
-        // unitCount = 0：取消並停止
-        // unitCount > 0：先送數字設定時間，再送 ON 啟動
+        // 液肥定時控制
+        // Stepper
+        //
+        // 重要：
+        // 這裡只送數字 1~6
+        // 不再額外送 ON
         // ================================
         public async Task PublishStepperTimerCommandAsync(
             int unitCount,
             CancellationToken cancellationToken = default)
         {
             if (unitCount < 0)
-                throw new ArgumentOutOfRangeException(nameof(unitCount), "Stepper 定時單位不能小於 0。");
+                throw new ArgumentOutOfRangeException(nameof(unitCount), "液肥定時單位不能小於 0。");
 
             if (unitCount > 144)
-                throw new ArgumentOutOfRangeException(nameof(unitCount), "Stepper 定時最多 144 單位，也就是 24 小時。");
+                throw new ArgumentOutOfRangeException(nameof(unitCount), "液肥定時最多 144 單位，也就是 24 小時。");
 
             if (_mqttClient == null)
                 throw new InvalidOperationException("MQTT Client 尚未初始化");
@@ -461,23 +471,13 @@ namespace WebLoginDemo2.Services
             }
             else
             {
-                var setUnitMessage = new MqttApplicationMessageBuilder()
+                var timerMessage = new MqttApplicationMessageBuilder()
                     .WithTopic(StepperCommandTopic)
                     .WithPayload(unitCount.ToString())
                     .WithRetainFlag(false)
                     .Build();
 
-                await _mqttClient.PublishAsync(setUnitMessage, cancellationToken);
-
-                await Task.Delay(200, cancellationToken);
-
-                var onMessage = new MqttApplicationMessageBuilder()
-                    .WithTopic(StepperCommandTopic)
-                    .WithPayload("ON")
-                    .WithRetainFlag(false)
-                    .Build();
-
-                await _mqttClient.PublishAsync(onMessage, cancellationToken);
+                await _mqttClient.PublishAsync(timerMessage, cancellationToken);
 
                 _latestData.Stepper = true;
             }
@@ -488,7 +488,7 @@ namespace WebLoginDemo2.Services
                 .SendAsync("ReceiveSensorData", _latestData, cancellationToken);
 
             _logger.LogInformation(
-                "✅ 已發送 Stepper 定時指令 Topic={Topic}, Unit={Unit}, Minutes={Minutes}",
+                "✅ 已發送液肥定時指令 Topic={Topic}, Unit={Unit}, Minutes={Minutes}",
                 StepperCommandTopic,
                 unitCount,
                 unitCount * TimerUnitMinutes
@@ -549,9 +549,9 @@ namespace WebLoginDemo2.Services
                     $"Humidity: {data.Humidity:F1}%\n" +
                     $"Soil: {data.Soil:F0}\n" +
                     $"SoilState: {data.SoilState}\n" +
-                    $"Relay5/D5: {OnOffText(data.Relay5)}\n" +
-                    $"Relay6/D6: {OnOffText(data.Relay6)}\n" +
-                    $"Stepper: {OnOffText(data.Stepper)}";
+                    $"滴灌: {OnOffText(data.Relay5)}\n" +
+                    $"生長燈: {OnOffText(data.Relay6)}\n" +
+                    $"液肥: {OnOffText(data.Stepper)}";
 
                 string msg =
                     $"🚨【智慧農場警報】\n" +

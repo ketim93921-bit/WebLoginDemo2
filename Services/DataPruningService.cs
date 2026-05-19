@@ -77,7 +77,7 @@ namespace WebLoginDemo2.Services
                 var sb = new StringBuilder();
 
                 sb.AppendLine(
-                    "時間,溫度,濕度,土壤數值,土壤狀態,Relay5(D5),Relay6(D6),Stepper"
+                    "時間,溫度,濕度,土壤數值,土壤狀態,滴灌,生長燈,液肥"
                 );
 
                 foreach (var item in dataToArchive)
@@ -87,7 +87,7 @@ namespace WebLoginDemo2.Services
                         $"{item.Temp}," +
                         $"{item.Humidity}," +
                         $"{item.Soil}," +
-                        $"{item.SoilState}," +
+                        $"{TranslateSoilState(item.SoilState)}," +
                         $"{BoolText(item.Relay5)}," +
                         $"{BoolText(item.Relay6)}," +
                         $"{BoolText(item.Stepper)}"
@@ -122,6 +122,17 @@ namespace WebLoginDemo2.Services
         private static string BoolText(bool value)
         {
             return value ? "ON" : "OFF";
+        }
+
+        private static string TranslateSoilState(string? soilState)
+        {
+            return soilState?.ToUpperInvariant() switch
+            {
+                "DRY" => "乾燥",
+                "MOIST" => "適中",
+                "WET" => "濕潤",
+                _ => soilState ?? string.Empty
+            };
         }
     }
 }
