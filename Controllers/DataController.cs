@@ -41,10 +41,6 @@ namespace WebLoginDemo2.Controllers
 
             var startTime = DateTime.Now.AddMinutes(-minutes);
 
-            // 先過濾明顯異常值：
-            // Temp = 0 通常代表 DHT 讀取失敗
-            // Humidity = 0 或 > 100 也屬於異常值
-            // Soil 正常範圍為 0 ~ 1024
             var rawData = await _db.SensorLogs
                 .AsNoTracking()
                 .Where(s => s.CreatedAt >= startTime)
@@ -58,7 +54,6 @@ namespace WebLoginDemo2.Controllers
                 .OrderBy(s => s.CreatedAt)
                 .ToListAsync();
 
-            // 每 1 分鐘平均一次，避免資料點太密造成圖表雜亂
             var chartData = rawData
                 .GroupBy(x => new
                 {
@@ -118,8 +113,11 @@ namespace WebLoginDemo2.Controllers
 
             var builder = new StringBuilder();
 
+            // Excel 專用：指定逗號作為分隔符，並搭配 UTF-8 BOM 避免中文亂碼
+            builder.AppendLine("sep=,");
+
             builder.AppendLine(
-                "紀錄時間,溫度(°C),濕度(%),土壤數值,土壤狀態,Relay5(D5),Relay6(D6),Stepper"
+                "紀錄時間,溫度(°C),濕度(%),土壤數值,土壤狀態,滴灌,生長燈,液肥"
             );
 
             foreach (var item in data)
@@ -129,7 +127,7 @@ namespace WebLoginDemo2.Controllers
                     $"{item.Temp}," +
                     $"{item.Humidity}," +
                     $"{item.Soil}," +
-                    $"{item.SoilState}," +
+                    $"{TranslateSoilState(item.SoilState)}," +
                     $"{BoolText(item.Relay5)}," +
                     $"{BoolText(item.Relay6)}," +
                     $"{BoolText(item.Stepper)}"
@@ -140,12 +138,24 @@ namespace WebLoginDemo2.Controllers
             var result = utf8WithBom.GetBytes(builder.ToString());
 
             string fileName = $"SensorData_{DateTime.Now:yyyyMMdd_HHmm}.csv";
-            return File(result, "text/csv", fileName);
+
+            return File(result, "text/csv; charset=utf-8", fileName);
         }
 
         private static string BoolText(bool value)
         {
             return value ? "ON" : "OFF";
+        }
+
+        private static string TranslateSoilState(string? soilState)
+        {
+            return soilState?.ToUpperInvariant() switch
+            {
+                "DRY" => "乾燥",
+                "MOIST" => "適中",
+                "WET" => "濕潤",
+                _ => soilState ?? string.Empty
+            };
         }
     }
 }
