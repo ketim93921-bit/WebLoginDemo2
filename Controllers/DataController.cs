@@ -113,7 +113,7 @@ namespace WebLoginDemo2.Controllers
 
             var builder = new StringBuilder();
 
-            // Excel 專用：指定逗號作為分隔符，並搭配 UTF-8 BOM 避免中文亂碼
+            // Excel 專用：指定逗號作為分隔符
             builder.AppendLine("sep=,");
 
             builder.AppendLine(
@@ -134,12 +134,15 @@ namespace WebLoginDemo2.Controllers
                 );
             }
 
-            var utf8WithBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
-            var result = utf8WithBom.GetBytes(builder.ToString());
+            // Windows Excel 直接開啟 CSV 時，Big5 對繁體中文最穩定
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            var big5 = Encoding.GetEncoding("big5");
+            var result = big5.GetBytes(builder.ToString());
 
             string fileName = $"SensorData_{DateTime.Now:yyyyMMdd_HHmm}.csv";
 
-            return File(result, "text/csv; charset=utf-8", fileName);
+            return File(result, "text/csv; charset=big5", fileName);
         }
 
         private static string BoolText(bool value)
