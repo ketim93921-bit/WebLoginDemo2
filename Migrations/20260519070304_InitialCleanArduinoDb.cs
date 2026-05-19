@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WebLoginDemo2.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCleanCloudDb : Migration
+    public partial class InitialCleanArduinoDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -63,14 +63,6 @@ namespace WebLoginDemo2.Migrations
                     Soil = table.Column<double>(type: "double", nullable: false),
                     SoilState = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    TempLimit = table.Column<double>(type: "double", nullable: false),
-                    SoilLimit = table.Column<int>(type: "int", nullable: false),
-                    TempAuto = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    SoilAuto = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Relay1 = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Relay2 = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Relay3 = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Relay4 = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Relay5 = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Relay6 = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Stepper = table.Column<bool>(type: "tinyint(1)", nullable: false),

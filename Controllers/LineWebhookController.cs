@@ -118,45 +118,53 @@ public class LineWebhookController : ControllerBase
                 await _line.ReplyMessagesAsync(replyToken, BuildControlMenuReply());
                 break;
 
-            case "風扇":
-            case "風扇控制":
-            case "Relay1":
-            case "relay1":
-                await _line.ReplyMessagesAsync(replyToken, BuildRelayControlReply(1, "風扇 / Relay1"));
-                break;
-
-            case "風扇開":
-            case "Relay1開":
-            case "relay1 on":
-                await _mqtt.PublishRelayCommandAsync(1, true);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("風扇 / Relay1", true));
-                break;
-
-            case "風扇關":
-            case "Relay1關":
-            case "relay1 off":
-                await _mqtt.PublishRelayCommandAsync(1, false);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("風扇 / Relay1", false));
-                break;
-
-            case "Relay5開":
-                await _mqtt.PublishRelayCommandAsync(5, true);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay5", true));
-                break;
-
-            case "Relay5關":
-                await _mqtt.PublishRelayCommandAsync(5, false);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay5", false));
+            case "Relay6":
+            case "D6":
+            case "Relay6控制":
+            case "D6控制":
+                await _line.ReplyMessagesAsync(replyToken, BuildRelay6ControlReply());
                 break;
 
             case "Relay6開":
+            case "D6開":
                 await _mqtt.PublishRelayCommandAsync(6, true);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6", true));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6 / D6", true));
                 break;
 
             case "Relay6關":
+            case "D6關":
                 await _mqtt.PublishRelayCommandAsync(6, false);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6", false));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6 / D6", false));
+                break;
+
+            case "Relay6定時10":
+            case "D6定時10":
+                await _mqtt.PublishRelay6TimerCommandAsync(1);
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("Relay6 / D6", 10));
+                break;
+
+            case "Relay6定時20":
+            case "D6定時20":
+                await _mqtt.PublishRelay6TimerCommandAsync(2);
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("Relay6 / D6", 20));
+                break;
+
+            case "Relay6定時30":
+            case "D6定時30":
+                await _mqtt.PublishRelay6TimerCommandAsync(3);
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("Relay6 / D6", 30));
+                break;
+
+            case "Relay6取消定時":
+            case "D6取消定時":
+                await _mqtt.PublishRelay6TimerCommandAsync(0);
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6 / D6", false));
+                break;
+
+            case "步進馬達":
+            case "馬達":
+            case "步進馬達控制":
+                await _line.ReplyMessagesAsync(replyToken, BuildStepperControlReply());
                 break;
 
             case "步進馬達開":
@@ -168,6 +176,30 @@ public class LineWebhookController : ControllerBase
             case "步進馬達關":
             case "馬達關":
                 await _mqtt.PublishStepperCommandAsync(false);
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("步進馬達", false));
+                break;
+
+            case "步進馬達定時10":
+            case "馬達定時10":
+                await _mqtt.PublishStepperTimerCommandAsync(1);
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("步進馬達", 10));
+                break;
+
+            case "步進馬達定時20":
+            case "馬達定時20":
+                await _mqtt.PublishStepperTimerCommandAsync(2);
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("步進馬達", 20));
+                break;
+
+            case "步進馬達定時30":
+            case "馬達定時30":
+                await _mqtt.PublishStepperTimerCommandAsync(3);
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("步進馬達", 30));
+                break;
+
+            case "步進馬達取消定時":
+            case "馬達取消定時":
+                await _mqtt.PublishStepperTimerCommandAsync(0);
                 await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("步進馬達", false));
                 break;
 
@@ -195,46 +227,42 @@ public class LineWebhookController : ControllerBase
                 await _line.ReplyMessagesAsync(replyToken, BuildControlMenuReply());
                 break;
 
-            case "action=relay1_menu":
-                await _line.ReplyMessagesAsync(replyToken, BuildRelayControlReply(1, "風扇 / Relay1"));
-                break;
-
-            case "action=relay5_menu":
-                await _line.ReplyMessagesAsync(replyToken, BuildRelayControlReply(5, "Relay5 土壤控制"));
-                break;
-
             case "action=relay6_menu":
-                await _line.ReplyMessagesAsync(replyToken, BuildRelayControlReply(6, "Relay6 定時控制"));
-                break;
-
-            case "action=relay1_on":
-                await _mqtt.PublishRelayCommandAsync(1, true);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("風扇 / Relay1", true));
-                break;
-
-            case "action=relay1_off":
-                await _mqtt.PublishRelayCommandAsync(1, false);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("風扇 / Relay1", false));
-                break;
-
-            case "action=relay5_on":
-                await _mqtt.PublishRelayCommandAsync(5, true);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay5", true));
-                break;
-
-            case "action=relay5_off":
-                await _mqtt.PublishRelayCommandAsync(5, false);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay5", false));
+                await _line.ReplyMessagesAsync(replyToken, BuildRelay6ControlReply());
                 break;
 
             case "action=relay6_on":
                 await _mqtt.PublishRelayCommandAsync(6, true);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6", true));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6 / D6", true));
                 break;
 
             case "action=relay6_off":
                 await _mqtt.PublishRelayCommandAsync(6, false);
-                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6", false));
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6 / D6", false));
+                break;
+
+            case "action=relay6_timer_1":
+                await _mqtt.PublishRelay6TimerCommandAsync(1);
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("Relay6 / D6", 10));
+                break;
+
+            case "action=relay6_timer_2":
+                await _mqtt.PublishRelay6TimerCommandAsync(2);
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("Relay6 / D6", 20));
+                break;
+
+            case "action=relay6_timer_3":
+                await _mqtt.PublishRelay6TimerCommandAsync(3);
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("Relay6 / D6", 30));
+                break;
+
+            case "action=relay6_timer_cancel":
+                await _mqtt.PublishRelay6TimerCommandAsync(0);
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("Relay6 / D6", false));
+                break;
+
+            case "action=stepper_menu":
+                await _line.ReplyMessagesAsync(replyToken, BuildStepperControlReply());
                 break;
 
             case "action=stepper_on":
@@ -244,6 +272,26 @@ public class LineWebhookController : ControllerBase
 
             case "action=stepper_off":
                 await _mqtt.PublishStepperCommandAsync(false);
+                await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("步進馬達", false));
+                break;
+
+            case "action=stepper_timer_1":
+                await _mqtt.PublishStepperTimerCommandAsync(1);
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("步進馬達", 10));
+                break;
+
+            case "action=stepper_timer_2":
+                await _mqtt.PublishStepperTimerCommandAsync(2);
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("步進馬達", 20));
+                break;
+
+            case "action=stepper_timer_3":
+                await _mqtt.PublishStepperTimerCommandAsync(3);
+                await _line.ReplyMessagesAsync(replyToken, BuildTimerResultReply("步進馬達", 30));
+                break;
+
+            case "action=stepper_timer_cancel":
+                await _mqtt.PublishStepperTimerCommandAsync(0);
                 await _line.ReplyMessagesAsync(replyToken, BuildControlResultReply("步進馬達", false));
                 break;
 
@@ -258,9 +306,6 @@ public class LineWebhookController : ControllerBase
         }
     }
 
-    // =========================
-    // 主選單
-    // =========================
     private IEnumerable<object> BuildMainMenuReply()
     {
         var dashboardUrl = _config["App:DashboardUrl"] ?? "https://你的公開網址/Dashboard";
@@ -345,13 +390,9 @@ public class LineWebhookController : ControllerBase
         };
     }
 
-    // =========================
-    // 狀態頁
-    // =========================
     private IEnumerable<object> BuildStatusReply()
     {
         var latest = _mqtt.GetLatestSensorData();
-
         string onlineText = _mqtt.IsMqttConnected ? "正常" : "離線";
 
         return new object[]
@@ -383,16 +424,8 @@ public class LineWebhookController : ControllerBase
                             BuildLargeInfoRow("濕度", $"{latest.Humidity:F1}%"),
                             BuildLargeInfoRow("土壤數值", $"{latest.Soil:F0}"),
                             BuildLargeInfoRow("土壤狀態", TranslateSoilState(latest.SoilState)),
-                            BuildLargeInfoRow("溫度門檻", $"{latest.TempLimit:F1}°C"),
-                            BuildLargeInfoRow("土壤門檻", $"{latest.SoilLimit}"),
-                            BuildLargeInfoRow("溫控自動", OnOffText(latest.TempAuto)),
-                            BuildLargeInfoRow("土壤自動", OnOffText(latest.SoilAuto)),
-                            BuildLargeInfoRow("Relay1", OnOffText(latest.Relay1)),
-                            BuildLargeInfoRow("Relay2", OnOffText(latest.Relay2)),
-                            BuildLargeInfoRow("Relay3", OnOffText(latest.Relay3)),
-                            BuildLargeInfoRow("Relay4", OnOffText(latest.Relay4)),
-                            BuildLargeInfoRow("Relay5", OnOffText(latest.Relay5)),
-                            BuildLargeInfoRow("Relay6", OnOffText(latest.Relay6)),
+                            BuildLargeInfoRow("Relay5 / D5", OnOffText(latest.Relay5)),
+                            BuildLargeInfoRow("Relay6 / D6", OnOffText(latest.Relay6)),
                             BuildLargeInfoRow("步進馬達", OnOffText(latest.Stepper)),
                             BuildLargeInfoRow("更新時間", $"{latest.Time:HH:mm:ss}")
                         }
@@ -433,9 +466,6 @@ public class LineWebhookController : ControllerBase
         };
     }
 
-    // =========================
-    // 控制選單
-    // =========================
     private IEnumerable<object> BuildControlMenuReply()
     {
         return new object[]
@@ -482,58 +512,24 @@ public class LineWebhookController : ControllerBase
                                 type = "button",
                                 style = "primary",
                                 height = "md",
-                                color = "#16A34A",
-                                action = new {
-                                    type = "postback",
-                                    label = "風扇 / Relay1",
-                                    data = "action=relay1_menu",
-                                    displayText = "風扇控制"
-                                }
-                            },
-                            new {
-                                type = "button",
-                                style = "primary",
-                                height = "md",
-                                color = "#0EA5E9",
-                                action = new {
-                                    type = "postback",
-                                    label = "Relay5 土壤控制",
-                                    data = "action=relay5_menu",
-                                    displayText = "Relay5 控制"
-                                }
-                            },
-                            new {
-                                type = "button",
-                                style = "primary",
-                                height = "md",
                                 color = "#6366F1",
                                 action = new {
                                     type = "postback",
-                                    label = "Relay6 定時控制",
+                                    label = "Relay6 / D6 控制",
                                     data = "action=relay6_menu",
                                     displayText = "Relay6 控制"
                                 }
                             },
                             new {
                                 type = "button",
-                                style = "secondary",
+                                style = "primary",
                                 height = "md",
+                                color = "#16A34A",
                                 action = new {
                                     type = "postback",
-                                    label = "步進馬達開",
-                                    data = "action=stepper_on",
-                                    displayText = "步進馬達開"
-                                }
-                            },
-                            new {
-                                type = "button",
-                                style = "secondary",
-                                height = "md",
-                                action = new {
-                                    type = "postback",
-                                    label = "步進馬達關",
-                                    data = "action=stepper_off",
-                                    displayText = "步進馬達關"
+                                    label = "步進馬達控制",
+                                    data = "action=stepper_menu",
+                                    displayText = "步進馬達控制"
                                 }
                             }
                         }
@@ -543,17 +539,14 @@ public class LineWebhookController : ControllerBase
         };
     }
 
-    // =========================
-    // Relay 控制頁
-    // =========================
-    private IEnumerable<object> BuildRelayControlReply(int relayNumber, string title)
+    private IEnumerable<object> BuildRelay6ControlReply()
     {
         return new object[]
         {
             new
             {
                 type = "flex",
-                altText = $"{title} 控制",
+                altText = "Relay6 / D6 控制",
                 contents = new
                 {
                     type = "bubble",
@@ -567,7 +560,7 @@ public class LineWebhookController : ControllerBase
                         {
                             new {
                                 type = "text",
-                                text = $"{title} 控制",
+                                text = "Relay6 / D6 控制",
                                 weight = "bold",
                                 size = "3xl",
                                 align = "center",
@@ -575,8 +568,8 @@ public class LineWebhookController : ControllerBase
                             },
                             new {
                                 type = "text",
-                                text = "請選擇操作",
-                                size = "xl",
+                                text = "1 單位 = 10 分鐘",
+                                size = "lg",
                                 align = "center",
                                 color = "#666666"
                             }
@@ -589,40 +582,13 @@ public class LineWebhookController : ControllerBase
                         spacing = "md",
                         contents = new object[]
                         {
-                            new {
-                                type = "button",
-                                style = "primary",
-                                height = "md",
-                                color = "#16A34A",
-                                action = new {
-                                    type = "postback",
-                                    label = "開啟",
-                                    data = $"action=relay{relayNumber}_on",
-                                    displayText = $"{title} 開"
-                                }
-                            },
-                            new {
-                                type = "button",
-                                style = "secondary",
-                                height = "md",
-                                action = new {
-                                    type = "postback",
-                                    label = "關閉",
-                                    data = $"action=relay{relayNumber}_off",
-                                    displayText = $"{title} 關"
-                                }
-                            },
-                            new {
-                                type = "button",
-                                style = "secondary",
-                                height = "md",
-                                action = new {
-                                    type = "postback",
-                                    label = "回設備控制",
-                                    data = "action=control_menu",
-                                    displayText = "設備控制"
-                                }
-                            }
+                            BuildPostbackButton("開啟", "action=relay6_on", "Relay6開", "#16A34A"),
+                            BuildPostbackButton("關閉", "action=relay6_off", "Relay6關"),
+                            BuildPostbackButton("定時 10 分鐘", "action=relay6_timer_1", "Relay6定時10", "#2563EB"),
+                            BuildPostbackButton("定時 20 分鐘", "action=relay6_timer_2", "Relay6定時20", "#2563EB"),
+                            BuildPostbackButton("定時 30 分鐘", "action=relay6_timer_3", "Relay6定時30", "#2563EB"),
+                            BuildPostbackButton("取消定時並關閉", "action=relay6_timer_cancel", "Relay6取消定時"),
+                            BuildPostbackButton("回設備控制", "action=control_menu", "設備控制")
                         }
                     }
                 }
@@ -630,9 +596,63 @@ public class LineWebhookController : ControllerBase
         };
     }
 
-    // =========================
-    // 控制結果
-    // =========================
+    private IEnumerable<object> BuildStepperControlReply()
+    {
+        return new object[]
+        {
+            new
+            {
+                type = "flex",
+                altText = "步進馬達控制",
+                contents = new
+                {
+                    type = "bubble",
+                    size = "mega",
+                    body = new
+                    {
+                        type = "box",
+                        layout = "vertical",
+                        spacing = "lg",
+                        contents = new object[]
+                        {
+                            new {
+                                type = "text",
+                                text = "步進馬達控制",
+                                weight = "bold",
+                                size = "3xl",
+                                align = "center",
+                                wrap = true
+                            },
+                            new {
+                                type = "text",
+                                text = "1 單位 = 10 分鐘",
+                                size = "lg",
+                                align = "center",
+                                color = "#666666"
+                            }
+                        }
+                    },
+                    footer = new
+                    {
+                        type = "box",
+                        layout = "vertical",
+                        spacing = "md",
+                        contents = new object[]
+                        {
+                            BuildPostbackButton("啟動", "action=stepper_on", "步進馬達開", "#16A34A"),
+                            BuildPostbackButton("關閉", "action=stepper_off", "步進馬達關"),
+                            BuildPostbackButton("定時 10 分鐘", "action=stepper_timer_1", "步進馬達定時10", "#2563EB"),
+                            BuildPostbackButton("定時 20 分鐘", "action=stepper_timer_2", "步進馬達定時20", "#2563EB"),
+                            BuildPostbackButton("定時 30 分鐘", "action=stepper_timer_3", "步進馬達定時30", "#2563EB"),
+                            BuildPostbackButton("取消定時並關閉", "action=stepper_timer_cancel", "步進馬達取消定時"),
+                            BuildPostbackButton("回設備控制", "action=control_menu", "設備控制")
+                        }
+                    }
+                }
+            }
+        };
+    }
+
     private IEnumerable<object> BuildControlResultReply(string deviceName, bool isOn)
     {
         var text = isOn
@@ -673,31 +693,80 @@ public class LineWebhookController : ControllerBase
                         spacing = "md",
                         contents = new object[]
                         {
-                            new {
-                                type = "button",
-                                style = "secondary",
-                                height = "md",
-                                action = new {
-                                    type = "postback",
-                                    label = "回設備控制",
-                                    data = "action=control_menu",
-                                    displayText = "設備控制"
-                                }
-                            },
-                            new {
-                                type = "button",
-                                style = "primary",
-                                height = "md",
-                                action = new {
-                                    type = "postback",
-                                    label = "查看狀態",
-                                    data = "action=status",
-                                    displayText = "農場狀態"
-                                }
-                            }
+                            BuildPostbackButton("回設備控制", "action=control_menu", "設備控制"),
+                            BuildPostbackButton("查看狀態", "action=status", "農場狀態", "#2563EB")
                         }
                     }
                 }
+            }
+        };
+    }
+
+    private IEnumerable<object> BuildTimerResultReply(string deviceName, int minutes)
+    {
+        var text = $"✅ {deviceName} 已啟動定時 {minutes} 分鐘";
+
+        return new object[]
+        {
+            new
+            {
+                type = "flex",
+                altText = text,
+                contents = new
+                {
+                    type = "bubble",
+                    size = "mega",
+                    body = new
+                    {
+                        type = "box",
+                        layout = "vertical",
+                        spacing = "lg",
+                        contents = new object[]
+                        {
+                            new {
+                                type = "text",
+                                text = text,
+                                weight = "bold",
+                                size = "3xl",
+                                align = "center",
+                                wrap = true
+                            }
+                        }
+                    },
+                    footer = new
+                    {
+                        type = "box",
+                        layout = "vertical",
+                        spacing = "md",
+                        contents = new object[]
+                        {
+                            BuildPostbackButton("回設備控制", "action=control_menu", "設備控制"),
+                            BuildPostbackButton("查看狀態", "action=status", "農場狀態", "#2563EB")
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    private static object BuildPostbackButton(
+        string label,
+        string data,
+        string displayText,
+        string? color = null)
+    {
+        return new
+        {
+            type = "button",
+            style = "primary",
+            height = "md",
+            color = color,
+            action = new
+            {
+                type = "postback",
+                label,
+                data,
+                displayText
             }
         };
     }

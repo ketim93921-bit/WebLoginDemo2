@@ -89,18 +89,6 @@ namespace WebLoginDemo2.Migrations
                     b.Property<double>("Humidity")
                         .HasColumnType("double");
 
-                    b.Property<bool>("Relay1")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("Relay2")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("Relay3")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("Relay4")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<bool>("Relay5")
                         .HasColumnType("tinyint(1)");
 
@@ -109,12 +97,6 @@ namespace WebLoginDemo2.Migrations
 
                     b.Property<double>("Soil")
                         .HasColumnType("double");
-
-                    b.Property<bool>("SoilAuto")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<int>("SoilLimit")
-                        .HasColumnType("int");
 
                     b.Property<string>("SoilState")
                         .IsRequired()
@@ -125,12 +107,6 @@ namespace WebLoginDemo2.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<double>("Temp")
-                        .HasColumnType("double");
-
-                    b.Property<bool>("TempAuto")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<double>("TempLimit")
                         .HasColumnType("double");
 
                     b.HasKey("Id");

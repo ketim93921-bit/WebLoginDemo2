@@ -18,26 +18,24 @@ namespace WebLoginDemo2.Controllers
 
         // ==============================
         // 舊版風扇控制 API
-        // 保留給 Dashboard / LINE 舊程式使用
-        // 目前將風扇對應為 Relay1
+        // 保留給舊程式使用
+        // 目前新版 Arduino 會對應到 Relay6 / D6
         // ==============================
         [HttpPost("fan/on")]
         public async Task<IActionResult> FanOn()
         {
-            return await SetRelayAsync(1, true, "風扇");
+            return await SetRelayAsync(6, true, "風扇 / Relay6");
         }
 
         [HttpPost("fan/off")]
         public async Task<IActionResult> FanOff()
         {
-            return await SetRelayAsync(1, false, "風扇");
+            return await SetRelayAsync(6, false, "風扇 / Relay6");
         }
 
         // ==============================
-        // 新版 Relay 控制 API
-        // POST /api/control/relay/1/on
-        // POST /api/control/relay/1/off
-        // Relay 編號：1 ~ 6
+        // Relay 控制 API
+        // 新版 Arduino 目前只有 Relay6 / D6 支援遠端控制
         // ==============================
         [HttpPost("relay/{relayNumber:int}/on")]
         public async Task<IActionResult> RelayOn(int relayNumber)
@@ -53,9 +51,11 @@ namespace WebLoginDemo2.Controllers
 
         // ==============================
         // Relay6 定時控制 API
-        // POST /api/control/relay6/timer/1  = 15 分鐘
-        // POST /api/control/relay6/timer/2  = 30 分鐘
-        // POST /api/control/relay6/timer/4  = 60 分鐘
+        // 新版 Arduino：1 單位 = 10 分鐘
+        //
+        // POST /api/control/relay6/timer/1  = 10 分鐘
+        // POST /api/control/relay6/timer/2  = 20 分鐘
+        // POST /api/control/relay6/timer/3  = 30 分鐘
         // POST /api/control/relay6/timer/0  = 取消定時並關閉
         // ==============================
         [HttpPost("relay6/timer/{unitCount:int}")]
@@ -70,12 +70,12 @@ namespace WebLoginDemo2.Controllers
                 });
             }
 
-            if (unitCount > 96)
+            if (unitCount > 144)
             {
                 return BadRequest(new
                 {
                     success = false,
-                    message = "Relay6 定時最多 96 單位，也就是 24 小時。"
+                    message = "Relay6 定時最多 144 單位，也就是 24 小時。"
                 });
             }
 
@@ -83,15 +83,17 @@ namespace WebLoginDemo2.Controllers
             {
                 await _mqttService.PublishRelay6TimerCommandAsync(unitCount);
 
+                int minutes = unitCount * 10;
+
                 return Ok(new
                 {
                     success = true,
                     device = "Relay6",
                     timerUnit = unitCount,
-                    minutes = unitCount * 15,
+                    minutes,
                     state = unitCount > 0 ? "ON" : "OFF",
                     message = unitCount > 0
-                        ? $"Relay6 已啟動定時 {unitCount * 15} 分鐘"
+                        ? $"Relay6 已啟動定時 {minutes} 分鐘"
                         : "Relay6 定時已取消並關閉"
                 });
             }
@@ -109,8 +111,6 @@ namespace WebLoginDemo2.Controllers
 
         // ==============================
         // Stepper 步進馬達控制 API
-        // POST /api/control/stepper/on
-        // POST /api/control/stepper/off
         // ==============================
         [HttpPost("stepper/on")]
         public async Task<IActionResult> StepperOn()
@@ -124,17 +124,76 @@ namespace WebLoginDemo2.Controllers
             return await SetStepperAsync(false);
         }
 
+        // ==============================
+        // Stepper 定時控制 API
+        // 新版 Arduino：1 單位 = 10 分鐘
+        //
+        // POST /api/control/stepper/timer/1 = 10 分鐘
+        // POST /api/control/stepper/timer/2 = 20 分鐘
+        // POST /api/control/stepper/timer/0 = 取消定時並停止
+        // ==============================
+        [HttpPost("stepper/timer/{unitCount:int}")]
+        public async Task<IActionResult> StepperTimer(int unitCount)
+        {
+            if (unitCount < 0)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Stepper 定時單位不能小於 0。"
+                });
+            }
+
+            if (unitCount > 144)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Stepper 定時最多 144 單位，也就是 24 小時。"
+                });
+            }
+
+            try
+            {
+                await _mqttService.PublishStepperTimerCommandAsync(unitCount);
+
+                int minutes = unitCount * 10;
+
+                return Ok(new
+                {
+                    success = true,
+                    device = "stepper",
+                    timerUnit = unitCount,
+                    minutes,
+                    state = unitCount > 0 ? "ON" : "OFF",
+                    message = unitCount > 0
+                        ? $"步進馬達已啟動定時 {minutes} 分鐘"
+                        : "步進馬達定時已取消並停止"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    device = "stepper",
+                    message = "步進馬達定時控制失敗",
+                    detail = ex.Message
+                });
+            }
+        }
+
         private async Task<IActionResult> SetRelayAsync(
             int relayNumber,
             bool on,
             string deviceName)
         {
-            if (relayNumber < 1 || relayNumber > 6)
+            if (relayNumber != 6)
             {
                 return BadRequest(new
                 {
                     success = false,
-                    message = "Relay 編號錯誤，必須是 1 到 6。"
+                    message = "目前新版 Arduino 只有 Relay6 / D6 支援遠端控制。"
                 });
             }
 

@@ -56,19 +56,8 @@ namespace WebLoginDemo2.Controllers
                 soil = x.Soil,
                 soilState = x.SoilState,
 
-                tempLimit = x.TempLimit,
-                soilLimit = x.SoilLimit,
-
-                tempAuto = x.TempAuto,
-                soilAuto = x.SoilAuto,
-
-                relay1 = x.Relay1,
-                relay2 = x.Relay2,
-                relay3 = x.Relay3,
-                relay4 = x.Relay4,
                 relay5 = x.Relay5,
                 relay6 = x.Relay6,
-
                 stepper = x.Stepper
             });
 
@@ -95,7 +84,7 @@ namespace WebLoginDemo2.Controllers
             var builder = new StringBuilder();
 
             builder.AppendLine(
-                "紀錄時間,溫度(°C),濕度(%),土壤數值,土壤狀態,溫度門檻,土壤門檻,溫控自動,土壤自動,Relay1,Relay2,Relay3,Relay4,Relay5,Relay6,Stepper"
+                "紀錄時間,溫度(°C),濕度(%),土壤數值,土壤狀態,Relay5(D5),Relay6(D6),Stepper"
             );
 
             foreach (var item in data)
@@ -106,14 +95,6 @@ namespace WebLoginDemo2.Controllers
                     $"{item.Humidity}," +
                     $"{item.Soil}," +
                     $"{item.SoilState}," +
-                    $"{item.TempLimit}," +
-                    $"{item.SoilLimit}," +
-                    $"{BoolText(item.TempAuto)}," +
-                    $"{BoolText(item.SoilAuto)}," +
-                    $"{BoolText(item.Relay1)}," +
-                    $"{BoolText(item.Relay2)}," +
-                    $"{BoolText(item.Relay3)}," +
-                    $"{BoolText(item.Relay4)}," +
                     $"{BoolText(item.Relay5)}," +
                     $"{BoolText(item.Relay6)}," +
                     $"{BoolText(item.Stepper)}"

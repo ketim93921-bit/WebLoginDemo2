@@ -77,7 +77,7 @@ namespace WebLoginDemo2.Services
                 var sb = new StringBuilder();
 
                 sb.AppendLine(
-                    "時間,溫度,濕度,土壤數值,土壤狀態,溫度門檻,土壤門檻,溫控自動,土壤自動,Relay1,Relay2,Relay3,Relay4,Relay5,Relay6,Stepper"
+                    "時間,溫度,濕度,土壤數值,土壤狀態,Relay5(D5),Relay6(D6),Stepper"
                 );
 
                 foreach (var item in dataToArchive)
@@ -88,14 +88,6 @@ namespace WebLoginDemo2.Services
                         $"{item.Humidity}," +
                         $"{item.Soil}," +
                         $"{item.SoilState}," +
-                        $"{item.TempLimit}," +
-                        $"{item.SoilLimit}," +
-                        $"{BoolText(item.TempAuto)}," +
-                        $"{BoolText(item.SoilAuto)}," +
-                        $"{BoolText(item.Relay1)}," +
-                        $"{BoolText(item.Relay2)}," +
-                        $"{BoolText(item.Relay3)}," +
-                        $"{BoolText(item.Relay4)}," +
                         $"{BoolText(item.Relay5)}," +
                         $"{BoolText(item.Relay6)}," +
                         $"{BoolText(item.Stepper)}"
