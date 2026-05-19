@@ -41,25 +41,60 @@ namespace WebLoginDemo2.Controllers
 
             var startTime = DateTime.Now.AddMinutes(-minutes);
 
-            var data = await _db.SensorLogs
+            // 先過濾明顯異常值：
+            // Temp = 0 通常代表 DHT 讀取失敗
+            // Humidity = 0 或 > 100 也屬於異常值
+            // Soil 正常範圍為 0 ~ 1024
+            var rawData = await _db.SensorLogs
                 .AsNoTracking()
                 .Where(s => s.CreatedAt >= startTime)
+                .Where(s =>
+                    s.Temp > 0 &&
+                    s.Temp < 60 &&
+                    s.Humidity > 0 &&
+                    s.Humidity <= 100 &&
+                    s.Soil >= 0 &&
+                    s.Soil <= 1024)
                 .OrderBy(s => s.CreatedAt)
                 .ToListAsync();
 
-            var chartData = data.Select(x => new
-            {
-                time = x.CreatedAt,
+            // 每 1 分鐘平均一次，避免資料點太密造成圖表雜亂
+            var chartData = rawData
+                .GroupBy(x => new
+                {
+                    x.CreatedAt.Year,
+                    x.CreatedAt.Month,
+                    x.CreatedAt.Day,
+                    x.CreatedAt.Hour,
+                    x.CreatedAt.Minute
+                })
+                .Select(g =>
+                {
+                    var last = g.OrderBy(x => x.CreatedAt).Last();
 
-                temp = x.Temp,
-                humidity = x.Humidity,
-                soil = x.Soil,
-                soilState = x.SoilState,
+                    return new
+                    {
+                        time = new DateTime(
+                            g.Key.Year,
+                            g.Key.Month,
+                            g.Key.Day,
+                            g.Key.Hour,
+                            g.Key.Minute,
+                            0
+                        ),
 
-                relay5 = x.Relay5,
-                relay6 = x.Relay6,
-                stepper = x.Stepper
-            });
+                        temp = Math.Round(g.Average(x => x.Temp), 1),
+                        humidity = Math.Round(g.Average(x => x.Humidity), 1),
+                        soil = Math.Round(g.Average(x => x.Soil), 0),
+
+                        soilState = last.SoilState,
+                        relay5 = last.Relay5,
+                        relay6 = last.Relay6,
+                        stepper = last.Stepper
+                    };
+                })
+                .OrderBy(x => x.time)
+                .ToList();
 
             return Ok(chartData);
         }

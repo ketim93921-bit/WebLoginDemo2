@@ -925,37 +925,42 @@
                 const data = await res.json();
                 console.log("History 成功:", data);
 
-                const values = data.map(d => Number(getVal(d, currentMetric)) || 0);
+                const values = data.map(d => {
+                    const value = Number(getVal(d, currentMetric));
+
+                    if (Number.isNaN(value)) return null;
+
+                    if (currentMetric === 'temp' && (value <= 0 || value > 60)) return null;
+                    if (currentMetric === 'humidity' && (value <= 0 || value > 100)) return null;
+                    if (currentMetric === 'soil' && (value < 0 || value > 1024)) return null;
+
+                    return value;
+                });
+
                 const rawTimes = data.map(d => new Date(d.time || d.Time || d.CreatedAt));
 
-                const labels = [];
-                let lastBucketKey = "";
-
-                for (const dt of rawTimes) {
+                const labels = rawTimes.map(dt => {
                     const hh = String(dt.getHours()).padStart(2, '0');
-                    const bucketMinute = Math.floor(dt.getMinutes() / 5) * 5;
-                    const mm = String(bucketMinute).padStart(2, '0');
-
-                    const bucketKey = `${hh}:${mm}`;
-
-                    if (bucketKey !== lastBucketKey) {
-                        labels.push(bucketKey);
-                        lastBucketKey = bucketKey;
-                    } else {
-                        labels.push('');
-                    }
-                }
+                    const mm = String(dt.getMinutes()).padStart(2, '0');
+                    return `${hh}:${mm}`;
+                });
 
                 let gradient = ctx.createLinearGradient(0, 0, 0, 400);
                 gradient.addColorStop(0, COLORS[currentMetric] + '50');
                 gradient.addColorStop(1, COLORS[currentMetric] + '00');
+
+                const metricLabels = {
+                    temp: '溫度',
+                    humidity: '濕度',
+                    soil: '土壤乾燥值'
+                };
 
                 chartInstance = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: currentMetric.toUpperCase(),
+                            label: metricLabels[currentMetric] || currentMetric,
                             data: values,
                             borderColor: COLORS[currentMetric],
                             backgroundColor: gradient,
@@ -963,41 +968,76 @@
                             pointRadius: 0,
                             pointHoverRadius: 6,
                             fill: true,
-                            tension: 0.4
+                            tension: 0.35,
+                            spanGaps: true
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        normalized: true,
                         plugins: {
                             legend: { display: false },
                             tooltip: {
                                 callbacks: {
                                     title: function (context) {
                                         const idx = context[0].dataIndex;
-                                        return rawTimes[idx].toLocaleTimeString('zh-TW', {
-                                            hour12: true,
+                                        const dt = rawTimes[idx];
+
+                                        return dt.toLocaleTimeString('zh-TW', {
+                                            hour12: false,
                                             hour: '2-digit',
                                             minute: '2-digit',
                                             second: '2-digit'
                                         });
+                                    },
+                                    label: function (context) {
+                                        const value = context.raw;
+
+                                        if (value === null || value === undefined) {
+                                            return '無有效資料';
+                                        }
+
+                                        if (currentMetric === 'temp') {
+                                            return `溫度：${value} °C`;
+                                        }
+
+                                        if (currentMetric === 'humidity') {
+                                            return `濕度：${value} %`;
+                                        }
+
+                                        if (currentMetric === 'soil') {
+                                            return `土壤乾燥值：${value}`;
+                                        }
+
+                                        return `${currentMetric}: ${value}`;
                                     }
                                 }
                             }
                         },
                         scales: {
                             x: {
-                                grid: { display: false },
+                                grid: {
+                                    display: false
+                                },
                                 ticks: {
                                     color: '#888',
-                                    autoSkip: false,
+                                    autoSkip: true,
+                                    maxTicksLimit: 8,
                                     maxRotation: 0,
                                     minRotation: 0
                                 }
                             },
                             y: {
-                                border: { display: false },
-                                grid: { color: 'rgba(200,200,200,0.1)' }
+                                beginAtZero: currentMetric === 'soil',
+                                suggestedMin: currentMetric === 'humidity' ? 0 : undefined,
+                                suggestedMax: currentMetric === 'humidity' ? 100 : undefined,
+                                border: {
+                                    display: false
+                                },
+                                grid: {
+                                    color: 'rgba(200,200,200,0.1)'
+                                }
                             }
                         },
                         interaction: {
@@ -1017,9 +1057,9 @@
             }
 
             historyRefreshTimer = setInterval(() => {
-                console.log("⏰ 圖表每 10 分鐘自動更新一次");
+                console.log("⏰ 圖表每 1 分鐘自動更新一次");
                 loadHistory();
-            }, 10 * 60 * 1000);
+            }, 60 * 1000);
         }
 
         function changeMetric(m, btn) {
