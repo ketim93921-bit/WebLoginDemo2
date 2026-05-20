@@ -37,8 +37,8 @@ namespace WebLoginDemo2.Services
         // Arduino 新程式：1 單位 = 10 分鐘
         private const int TimerUnitMinutes = 10;
 
-        // Arduino 土壤門檻：soil > 950 啟動滴灌
-        private const int DefaultSoilLimit = 950;
+        // 土壤門檻：soil > 700 啟動滴灌
+        private const int DefaultSoilLimit = 700;
 
         // ================================
         // 最新感測資料
@@ -650,13 +650,19 @@ namespace WebLoginDemo2.Services
 
         private static string GetSoilState(double soilValue)
         {
-            if (soilValue > DefaultSoilLimit)
+            // 乾燥：701 ~ 1024
+            if (soilValue > DefaultSoilLimit && soilValue <= 1024)
                 return "DRY";
 
-            if (soilValue < 900)
+            // 適中：400 ~ 700
+            if (soilValue >= 400 && soilValue <= DefaultSoilLimit)
+                return "MOIST";
+
+            // 潮濕：200 ~ 399
+            if (soilValue >= 200 && soilValue < 400)
                 return "WET";
 
-            return "MOIST";
+            return "UNKNOWN";
         }
 
         private static bool IsOn(string? value)
@@ -683,6 +689,9 @@ namespace WebLoginDemo2.Services
 
         [JsonProperty("soil")]
         public double Soil { get; set; }
+
+        [JsonProperty("soilState")]
+        public string? SoilState { get; set; }
 
         [JsonProperty("relayD5")]
         public string RelayD5 { get; set; } = "OFF";

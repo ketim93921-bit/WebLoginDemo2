@@ -16,213 +16,213 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
 
     <style>
-        :root {
-            --bg-body: #f0f2f5;
-            --surface: rgba(255, 255, 255, 0.9);
-            --surface-glass: rgba(255, 255, 255, 0.65);
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border: rgba(255, 255, 255, 0.8);
-            --accent-temp: #ff6b6b;
-            --accent-hum: #4dabf7;
-            --accent-soil: #ae3ec9;
-            --accent-ok: #20c997;
-            --accent-warn: #ff8787;
-            --shadow-card: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-        }
-
-        [data-theme="dark"] {
-            --bg-body: #0f172a;
-            --surface: rgba(30, 41, 59, 0.85);
-            --surface-glass: rgba(15, 23, 42, 0.6);
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --border: rgba(255, 255, 255, 0.05);
-            --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        }
-
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-body);
-            background-image: radial-gradient(at 0% 0%, rgba(77, 171, 247, 0.1) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(174, 62, 201, 0.1) 0px, transparent 50%);
-            background-attachment: fixed;
-            color: var(--text-primary);
-            transition: background 0.3s ease;
-            min-height: 100vh;
-            padding-bottom: 50px;
-        }
-
-        .glass-nav {
-            background: var(--surface-glass);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border);
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            margin-bottom: 30px;
-        }
-
-        .container-custom {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 24px;
-            height: 100%;
-            min-height: 200px;
-            box-shadow: var(--shadow-card);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-            .stat-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 15px 40px -10px rgba(0,0,0,0.15);
+            :root {
+                --bg-body: #f0f2f5;
+                --surface: rgba(255, 255, 255, 0.9);
+                --surface-glass: rgba(255, 255, 255, 0.65);
+                --text-primary: #1e293b;
+                --text-secondary: #64748b;
+                --border: rgba(255, 255, 255, 0.8);
+                --accent-temp: #ff6b6b;
+                --accent-hum: #4dabf7;
+                --accent-soil: #ae3ec9;
+                --accent-ok: #20c997;
+                --accent-warn: #ff8787;
+                --shadow-card: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
             }
 
-        .card-bg-circle {
-            position: absolute;
-            top: -20px;
-            right: -20px;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            opacity: 0.1;
-            filter: blur(20px);
-        }
-
-        .card-header-custom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .icon-circle {
-            width: 48px;
-            height: 48px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-        }
-
-        .value-display {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 42px;
-            font-weight: 700;
-            letter-spacing: -1px;
-            line-height: 1;
-            margin-bottom: 5px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .unit-label {
-            font-size: 15px;
-            color: var(--text-secondary);
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-
-        .skeleton {
-            background: linear-gradient(90deg, rgba(150,150,150,0.1) 25%, rgba(150,150,150,0.2) 50%, rgba(150,150,150,0.1) 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 8px;
-        }
-
-        .skeleton-text {
-            height: 40px;
-            width: 80px;
-            display: none;
-        }
-
-        @@keyframes loading {
-            0% {
-                background-position: 200% 0;
+            [data-theme="dark"] {
+                --bg-body: #0f172a;
+                --surface: rgba(30, 41, 59, 0.85);
+                --surface-glass: rgba(15, 23, 42, 0.6);
+                --text-primary: #f1f5f9;
+                --text-secondary: #94a3b8;
+                --border: rgba(255, 255, 255, 0.05);
+                --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             }
 
-            100% {
-                background-position: -200% 0;
-            }
-        }
-
-        .status-pill {
-            padding: 4px 12px;
-            border-radius: 99px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-            .status-pill.ok {
-                background: rgba(32, 201, 151, 0.1);
-                color: var(--accent-ok);
+            body {
+                font-family: 'Outfit', sans-serif;
+                background-color: var(--bg-body);
+                background-image: radial-gradient(at 0% 0%, rgba(77, 171, 247, 0.1) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(174, 62, 201, 0.1) 0px, transparent 50%);
+                background-attachment: fixed;
+                color: var(--text-primary);
+                transition: background 0.3s ease;
+                min-height: 100vh;
+                padding-bottom: 50px;
             }
 
-            .status-pill.warn {
-                background: rgba(255, 135, 135, 0.1);
-                color: var(--accent-warn);
+            .glass-nav {
+                background: var(--surface-glass);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                border-bottom: 1px solid var(--border);
+                padding: 15px 0;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                margin-bottom: 30px;
             }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: currentColor;
-        }
-
-        .chart-container-glass {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 30px;
-            box-shadow: var(--shadow-card);
-            margin-top: 30px;
-        }
-
-        .btn-toggle {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-
-            .btn-toggle:hover,
-            .btn-toggle.active {
-                background: var(--text-primary);
-                color: var(--bg-body);
+            .container-custom {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 24px;
             }
 
-            .btn-toggle:disabled {
-                opacity: 0.6;
-                cursor: not-allowed;
+            .stat-card {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 24px;
+                padding: 24px;
+                height: 100%;
+                min-height: 200px;
+                box-shadow: var(--shadow-card);
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                position: relative;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
             }
 
-        .grid-layout {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-        }
+                .stat-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 15px 40px -10px rgba(0,0,0,0.15);
+                }
+
+            .card-bg-circle {
+                position: absolute;
+                top: -20px;
+                right: -20px;
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+                opacity: 0.1;
+                filter: blur(20px);
+            }
+
+            .card-header-custom {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 15px;
+            }
+
+            .icon-circle {
+                width: 48px;
+                height: 48px;
+                border-radius: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 22px;
+            }
+
+            .value-display {
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 42px;
+                font-weight: 700;
+                letter-spacing: -1px;
+                line-height: 1;
+                margin-bottom: 5px;
+                position: relative;
+                z-index: 2;
+            }
+
+            .unit-label {
+                font-size: 15px;
+                color: var(--text-secondary);
+                font-weight: 500;
+                letter-spacing: 0.5px;
+            }
+
+            .skeleton {
+                background: linear-gradient(90deg, rgba(150,150,150,0.1) 25%, rgba(150,150,150,0.2) 50%, rgba(150,150,150,0.1) 75%);
+                background-size: 200% 100%;
+                animation: loading 1.5s infinite;
+                border-radius: 8px;
+            }
+
+            .skeleton-text {
+                height: 40px;
+                width: 80px;
+                display: none;
+            }
+
+            @@keyframes loading {
+                0% {
+                    background-position: 200% 0;
+                }
+
+                100% {
+                    background-position: -200% 0;
+                }
+            }
+
+            .status-pill {
+                padding: 4px 12px;
+                border-radius: 99px;
+                font-size: 12px;
+                font-weight: 600;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+                .status-pill.ok {
+                    background: rgba(32, 201, 151, 0.1);
+                    color: var(--accent-ok);
+                }
+
+                .status-pill.warn {
+                    background: rgba(255, 135, 135, 0.1);
+                    color: var(--accent-warn);
+                }
+
+            .status-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: currentColor;
+            }
+
+            .chart-container-glass {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 24px;
+                padding: 30px;
+                box-shadow: var(--shadow-card);
+                margin-top: 30px;
+            }
+
+            .btn-toggle {
+                background: transparent;
+                border: 1px solid var(--border);
+                color: var(--text-secondary);
+                padding: 8px 16px;
+                border-radius: 12px;
+                font-size: 14px;
+                font-weight: 500;
+                transition: 0.2s;
+            }
+
+                .btn-toggle:hover,
+                .btn-toggle.active {
+                    background: var(--text-primary);
+                    color: var(--bg-body);
+                }
+
+                .btn-toggle:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+
+            .grid-layout {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 24px;
+            }
     </style>
 </head>
 <body>
@@ -478,634 +478,634 @@
         let historyRefreshTimer = null;
 
         const COLORS = {
-            temp: '#ff6b6b',
-            humidity: '#4dabf7',
-            soil: '#ae3ec9'
+        temp: '#ff6b6b',
+        humidity: '#4dabf7',
+        soil: '#ae3ec9'
         };
 
         function getVal(data, key) {
-            if (!data) return null;
+        if (!data) return null;
 
-            const candidates = [
-                key,
-                key.charAt(0).toUpperCase() + key.slice(1),
-                key.toUpperCase()
-            ];
+        const candidates = [
+        key,
+        key.charAt(0).toUpperCase() + key.slice(1),
+        key.toUpperCase()
+        ];
 
-            for (let k of candidates) {
-                if (k && data[k] !== undefined) return data[k];
-            }
+        for (let k of candidates) {
+        if (k && data[k] !== undefined) return data[k];
+        }
 
-            return null;
+        return null;
         }
 
         function isOn(value) {
-            return value === true ||
-                value === 1 ||
-                value === "1" ||
-                String(value).toUpperCase() === "ON" ||
-                String(value).toUpperCase() === "TRUE";
+        return value === true ||
+        value === 1 ||
+        value === "1" ||
+        String(value).toUpperCase() === "ON" ||
+        String(value).toUpperCase() === "TRUE";
         }
 
         function updateDashboard(data) {
-            console.log("收到數據 (Raw):", data);
+        console.log("收到數據 (Raw):", data);
 
-            const temp = getVal(data, 'temp');
-            const humidity = getVal(data, 'humidity');
-            const soil = getVal(data, 'soil');
-            const soilState = getVal(data, 'soilState');
+        const temp = getVal(data, 'temp');
+        const humidity = getVal(data, 'humidity');
+        const soil = getVal(data, 'soil');
+        const soilState = getVal(data, 'soilState');
 
-            updateSingleCard('temp', temp);
-            updateSingleCard('hum', humidity);
+        updateSingleCard('temp', temp);
+        updateSingleCard('hum', humidity);
 
-            updateTempBadge(temp);
-            updateHumBadge(humidity);
-            updateSoilUI(soil, soilState);
+        updateTempBadge(temp);
+        updateHumBadge(humidity);
+        updateSoilUI(soil, soilState);
 
-            updateRelayUI(5, getVal(data, 'relay5'));
-            updateRelayUI(6, getVal(data, 'relay6'));
-            updateStepperUI(getVal(data, 'stepper'));
+        updateRelayUI(5, getVal(data, 'relay5'));
+        updateRelayUI(6, getVal(data, 'relay6'));
+        updateStepperUI(getVal(data, 'stepper'));
         }
 
         function updateSingleCard(idPrefix, val) {
-            const el = document.getElementById(idPrefix + '_value');
-            const skel = document.getElementById(idPrefix + '_skel');
+        const el = document.getElementById(idPrefix + '_value');
+        const skel = document.getElementById(idPrefix + '_skel');
 
-            if (!el || !skel) return;
+        if (!el || !skel) return;
 
-            if (val !== null && val !== undefined) {
-                skel.style.display = 'none';
-                el.style.display = 'block';
-                el.innerText = Number(val).toFixed(1);
-            }
+        if (val !== null && val !== undefined) {
+        skel.style.display = 'none';
+        el.style.display = 'block';
+        el.innerText = Number(val).toFixed(1);
+        }
         }
 
         function updateTempBadge(t) {
-            const badge = document.getElementById('temp_badge');
-            if (!badge || t === null || t === undefined) return;
+        const badge = document.getElementById('temp_badge');
+        if (!badge || t === null || t === undefined) return;
 
-            const warn = Number(t) > 35 || Number(t) < 10;
+        const warn = Number(t) > 35 || Number(t) < 10;
 
-            badge.className = warn ? 'status-pill warn' : 'status-pill ok';
-            badge.innerHTML = warn
-                ? '<div class="status-dot"></div>異常'
-                : '<div class="status-dot"></div>正常';
+        badge.className = warn ? 'status-pill warn' : 'status-pill ok';
+        badge.innerHTML = warn
+        ? '<div class="status-dot"></div>異常'
+        : '<div class="status-dot"></div>正常';
         }
 
         function updateHumBadge(h) {
-            const badge = document.getElementById('hum_badge');
-            if (!badge || h === null || h === undefined) return;
+        const badge = document.getElementById('hum_badge');
+        if (!badge || h === null || h === undefined) return;
 
-            const warn = Number(h) < 40;
+        const warn = Number(h) < 40;
 
-            badge.className = warn ? 'status-pill warn' : 'status-pill ok';
-            badge.innerHTML = warn
-                ? '<div class="status-dot"></div>偏低'
-                : '<div class="status-dot"></div>正常';
+        badge.className = warn ? 'status-pill warn' : 'status-pill ok';
+        badge.innerHTML = warn
+        ? '<div class="status-dot"></div>偏低'
+        : '<div class="status-dot"></div>正常';
         }
 
         function translateSoilState(state) {
-            const s = String(state || '').toUpperCase();
+        const s = String(state || '').toUpperCase();
 
-            if (s === 'DRY') return '乾燥';
-            if (s === 'MOIST') return '適中';
-            if (s === 'WET') return '濕潤';
+        if (s === 'DRY') return '乾燥';
+        if (s === 'MOIST') return '適中';
+        if (s === 'WET') return '潮濕';
 
-            return state || '未知';
+        return state || '未知';
         }
 
         function updateSoilUI(soil, soilState) {
-            const soilEl = document.getElementById('soil_value');
-            const soilSkel = document.getElementById('soil_skel');
-            const soilBadge = document.getElementById('soil_badge');
+        const soilEl = document.getElementById('soil_value');
+        const soilSkel = document.getElementById('soil_skel');
+        const soilBadge = document.getElementById('soil_badge');
 
-            if (!soilEl || !soilSkel || !soilBadge) return;
+        if (!soilEl || !soilSkel || !soilBadge) return;
 
-            if (soil !== null && soil !== undefined) {
-                soilSkel.style.display = 'none';
-                soilEl.style.display = 'block';
+        if (soil !== null && soil !== undefined) {
+        soilSkel.style.display = 'none';
+        soilEl.style.display = 'block';
 
-                const stateText = translateSoilState(soilState);
-                const isDry = String(soilState || '').toUpperCase() === 'DRY';
+        const stateText = translateSoilState(soilState);
+        const isDry = String(soilState || '').toUpperCase() === 'DRY';
 
-                soilEl.innerText = `${Number(soil).toFixed(0)} / ${stateText}`;
-                soilEl.style.color = isDry ? "var(--accent-warn)" : "var(--accent-ok)";
+        soilEl.innerText = `${Number(soil).toFixed(0)} / ${stateText}`;
+        soilEl.style.color = isDry ? "var(--accent-warn)" : "var(--accent-ok)";
 
-                soilBadge.className = isDry ? "status-pill warn" : "status-pill ok";
-                soilBadge.innerHTML = isDry
-                    ? '<div class="status-dot"></div>需澆水'
-                    : '<div class="status-dot"></div>良好';
-            }
+        soilBadge.className = isDry ? "status-pill warn" : "status-pill ok";
+        soilBadge.innerHTML = isDry
+        ? '<div class="status-dot"></div>需澆水'
+        : `<div class="status-dot"></div>${stateText}`;
+        }
         }
 
         function updateRelayUI(relayNumber, value) {
-            const relayEl = document.getElementById(`relay${relayNumber}_value`);
-            const relaySkel = document.getElementById(`relay${relayNumber}_skel`);
-            const relayBadge = document.getElementById(`relay${relayNumber}_badge`);
-            const onBtn = document.getElementById(`relay${relayNumber}OnBtn`);
-            const offBtn = document.getElementById(`relay${relayNumber}OffBtn`);
+        const relayEl = document.getElementById(`relay${relayNumber}_value`);
+        const relaySkel = document.getElementById(`relay${relayNumber}_skel`);
+        const relayBadge = document.getElementById(`relay${relayNumber}_badge`);
+        const onBtn = document.getElementById(`relay${relayNumber}OnBtn`);
+        const offBtn = document.getElementById(`relay${relayNumber}OffBtn`);
 
-            if (!relayEl || !relaySkel || !relayBadge) return;
+        if (!relayEl || !relaySkel || !relayBadge) return;
 
-            if (value !== null && value !== undefined) {
-                relaySkel.style.display = 'none';
-                relayEl.style.display = 'block';
+        if (value !== null && value !== undefined) {
+        relaySkel.style.display = 'none';
+        relayEl.style.display = 'block';
 
-                const active = isOn(value);
+        const active = isOn(value);
 
-                relayEl.innerText = active ? "開啟" : "關閉";
-                relayEl.style.color = active ? "var(--accent-ok)" : "var(--accent-warn)";
+        relayEl.innerText = active ? "開啟" : "關閉";
+        relayEl.style.color = active ? "var(--accent-ok)" : "var(--accent-warn)";
 
-                relayBadge.className = active ? "status-pill ok" : "status-pill warn";
-                relayBadge.innerHTML = active
-                    ? '<div class="status-dot"></div>ON'
-                    : '<div class="status-dot"></div>OFF';
+        relayBadge.className = active ? "status-pill ok" : "status-pill warn";
+        relayBadge.innerHTML = active
+        ? '<div class="status-dot"></div>ON'
+        : '<div class="status-dot"></div>OFF';
 
-                if (onBtn) onBtn.classList.toggle('active', active);
-                if (offBtn) offBtn.classList.toggle('active', !active);
-            }
+        if (onBtn) onBtn.classList.toggle('active', active);
+        if (offBtn) offBtn.classList.toggle('active', !active);
+        }
         }
 
         function updateStepperUI(value) {
-            const el = document.getElementById('stepper_value');
-            const skel = document.getElementById('stepper_skel');
-            const badge = document.getElementById('stepper_badge');
-            const onBtn = document.getElementById('stepperOnBtn');
-            const offBtn = document.getElementById('stepperOffBtn');
+        const el = document.getElementById('stepper_value');
+        const skel = document.getElementById('stepper_skel');
+        const badge = document.getElementById('stepper_badge');
+        const onBtn = document.getElementById('stepperOnBtn');
+        const offBtn = document.getElementById('stepperOffBtn');
 
-            if (!el || !skel || !badge) return;
+        if (!el || !skel || !badge) return;
 
-            if (value !== null && value !== undefined) {
-                skel.style.display = 'none';
-                el.style.display = 'block';
+        if (value !== null && value !== undefined) {
+        skel.style.display = 'none';
+        el.style.display = 'block';
 
-                const active = isOn(value);
+        const active = isOn(value);
 
-                el.innerText = active ? "啟動" : "關閉";
-                el.style.color = active ? "var(--accent-ok)" : "var(--accent-warn)";
+        el.innerText = active ? "啟動" : "關閉";
+        el.style.color = active ? "var(--accent-ok)" : "var(--accent-warn)";
 
-                badge.className = active ? "status-pill ok" : "status-pill warn";
-                badge.innerHTML = active
-                    ? '<div class="status-dot"></div>運轉中'
-                    : '<div class="status-dot"></div>已停止';
+        badge.className = active ? "status-pill ok" : "status-pill warn";
+        badge.innerHTML = active
+        ? '<div class="status-dot"></div>運轉中'
+        : '<div class="status-dot"></div>已停止';
 
-                if (onBtn) onBtn.classList.toggle('active', active);
-                if (offBtn) offBtn.classList.toggle('active', !active);
-            }
+        if (onBtn) onBtn.classList.toggle('active', active);
+        if (offBtn) offBtn.classList.toggle('active', !active);
+        }
         }
 
         async function controlRelay(relayNumber, on) {
-            const onBtn = document.getElementById(`relay${relayNumber}OnBtn`);
-            const offBtn = document.getElementById(`relay${relayNumber}OffBtn`);
+        const onBtn = document.getElementById(`relay${relayNumber}OnBtn`);
+        const offBtn = document.getElementById(`relay${relayNumber}OffBtn`);
 
-            if (onBtn) onBtn.disabled = true;
-            if (offBtn) offBtn.disabled = true;
+        if (onBtn) onBtn.disabled = true;
+        if (offBtn) offBtn.disabled = true;
 
-            try {
-                const url = on
-                    ? `/api/control/relay/${relayNumber}/on`
-                    : `/api/control/relay/${relayNumber}/off`;
+        try {
+        const url = on
+        ? `/api/control/relay/${relayNumber}/on`
+        : `/api/control/relay/${relayNumber}/off`;
 
-                const res = await fetch(url, { method: 'POST' });
+        const res = await fetch(url, { method: 'POST' });
 
-                if (!res.ok) {
-                    const text = await res.text();
-                    throw new Error(text);
-                }
+        if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text);
+        }
 
-                updateRelayUI(relayNumber, on);
-            } catch (err) {
-                console.error(`❌ Relay${relayNumber} 控制失敗:`, err);
-                alert(`控制失敗，請檢查後端與 MQTT 連線。`);
-            } finally {
-                if (onBtn) onBtn.disabled = false;
-                if (offBtn) offBtn.disabled = false;
-            }
+        updateRelayUI(relayNumber, on);
+        } catch (err) {
+        console.error(`❌ Relay${relayNumber} 控制失敗:`, err);
+        alert(`控制失敗，請檢查後端與 MQTT 連線。`);
+        } finally {
+        if (onBtn) onBtn.disabled = false;
+        if (offBtn) offBtn.disabled = false;
+        }
         }
 
         async function controlRelay6Timer() {
-            const select = document.getElementById('relay6TimerUnit');
-            const timerBtn = document.getElementById('relay6TimerBtn');
-            const cancelBtn = document.getElementById('relay6CancelTimerBtn');
+        const select = document.getElementById('relay6TimerUnit');
+        const timerBtn = document.getElementById('relay6TimerBtn');
+        const cancelBtn = document.getElementById('relay6CancelTimerBtn');
 
-            if (!select) return;
+        if (!select) return;
 
-            const unitCount = Number(select.value);
+        const unitCount = Number(select.value);
 
-            if (timerBtn) timerBtn.disabled = true;
-            if (cancelBtn) cancelBtn.disabled = true;
+        if (timerBtn) timerBtn.disabled = true;
+        if (cancelBtn) cancelBtn.disabled = true;
 
-            try {
-                const res = await fetch(`/api/control/relay6/timer/${unitCount}`, {
-                    method: 'POST'
-                });
+        try {
+        const res = await fetch(`/api/control/relay6/timer/${unitCount}`, {
+        method: 'POST'
+        });
 
-                if (!res.ok) {
-                    const text = await res.text();
-                    throw new Error(text);
-                }
+        if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text);
+        }
 
-                updateRelayUI(6, true);
+        updateRelayUI(6, true);
 
-                alert(`生長燈已啟動定時 ${unitCount * 10} 分鐘`);
-            } catch (err) {
-                console.error("❌ 生長燈定時控制失敗:", err);
-                alert("生長燈定時控制失敗，請檢查後端與 MQTT 連線。");
-            } finally {
-                if (timerBtn) timerBtn.disabled = false;
-                if (cancelBtn) cancelBtn.disabled = false;
-            }
+        alert(`生長燈已啟動定時 ${unitCount * 10} 分鐘`);
+        } catch (err) {
+        console.error("❌ 生長燈定時控制失敗:", err);
+        alert("生長燈定時控制失敗，請檢查後端與 MQTT 連線。");
+        } finally {
+        if (timerBtn) timerBtn.disabled = false;
+        if (cancelBtn) cancelBtn.disabled = false;
+        }
         }
 
         async function cancelRelay6Timer() {
-            const timerBtn = document.getElementById('relay6TimerBtn');
-            const cancelBtn = document.getElementById('relay6CancelTimerBtn');
+        const timerBtn = document.getElementById('relay6TimerBtn');
+        const cancelBtn = document.getElementById('relay6CancelTimerBtn');
 
-            if (timerBtn) timerBtn.disabled = true;
-            if (cancelBtn) cancelBtn.disabled = true;
+        if (timerBtn) timerBtn.disabled = true;
+        if (cancelBtn) cancelBtn.disabled = true;
 
-            try {
-                const res = await fetch('/api/control/relay6/timer/0', {
-                    method: 'POST'
-                });
+        try {
+        const res = await fetch('/api/control/relay6/timer/0', {
+        method: 'POST'
+        });
 
-                if (!res.ok) {
-                    const text = await res.text();
-                    throw new Error(text);
-                }
+        if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text);
+        }
 
-                updateRelayUI(6, false);
+        updateRelayUI(6, false);
 
-                alert("生長燈定時已取消並關閉");
-            } catch (err) {
-                console.error("❌ 生長燈取消定時失敗:", err);
-                alert("生長燈取消定時失敗，請檢查後端與 MQTT 連線。");
-            } finally {
-                if (timerBtn) timerBtn.disabled = false;
-                if (cancelBtn) cancelBtn.disabled = false;
-            }
+        alert("生長燈定時已取消並關閉");
+        } catch (err) {
+        console.error("❌ 生長燈取消定時失敗:", err);
+        alert("生長燈取消定時失敗，請檢查後端與 MQTT 連線。");
+        } finally {
+        if (timerBtn) timerBtn.disabled = false;
+        if (cancelBtn) cancelBtn.disabled = false;
+        }
         }
 
         async function controlStepper(on) {
-            const onBtn = document.getElementById('stepperOnBtn');
-            const offBtn = document.getElementById('stepperOffBtn');
+        const onBtn = document.getElementById('stepperOnBtn');
+        const offBtn = document.getElementById('stepperOffBtn');
 
-            if (onBtn) onBtn.disabled = true;
-            if (offBtn) offBtn.disabled = true;
+        if (onBtn) onBtn.disabled = true;
+        if (offBtn) offBtn.disabled = true;
 
-            try {
-                const url = on
-                    ? '/api/control/stepper/on'
-                    : '/api/control/stepper/off';
+        try {
+        const url = on
+        ? '/api/control/stepper/on'
+        : '/api/control/stepper/off';
 
-                const res = await fetch(url, { method: 'POST' });
+        const res = await fetch(url, { method: 'POST' });
 
-                if (!res.ok) {
-                    const text = await res.text();
-                    throw new Error(text);
-                }
+        if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text);
+        }
 
-                updateStepperUI(on);
-            } catch (err) {
-                console.error("❌ 液肥控制失敗:", err);
-                alert("液肥控制失敗，請檢查後端與 MQTT 連線。");
-            } finally {
-                if (onBtn) onBtn.disabled = false;
-                if (offBtn) offBtn.disabled = false;
-            }
+        updateStepperUI(on);
+        } catch (err) {
+        console.error("❌ 液肥控制失敗:", err);
+        alert("液肥控制失敗，請檢查後端與 MQTT 連線。");
+        } finally {
+        if (onBtn) onBtn.disabled = false;
+        if (offBtn) offBtn.disabled = false;
+        }
         }
 
         async function controlStepperTimer() {
-            const select = document.getElementById('stepperTimerUnit');
-            const timerBtn = document.getElementById('stepperTimerBtn');
-            const cancelBtn = document.getElementById('stepperCancelTimerBtn');
+        const select = document.getElementById('stepperTimerUnit');
+        const timerBtn = document.getElementById('stepperTimerBtn');
+        const cancelBtn = document.getElementById('stepperCancelTimerBtn');
 
-            if (!select) return;
+        if (!select) return;
 
-            const unitCount = Number(select.value);
+        const unitCount = Number(select.value);
 
-            if (timerBtn) timerBtn.disabled = true;
-            if (cancelBtn) cancelBtn.disabled = true;
+        if (timerBtn) timerBtn.disabled = true;
+        if (cancelBtn) cancelBtn.disabled = true;
 
-            try {
-                const res = await fetch(`/api/control/stepper/timer/${unitCount}`, {
-                    method: 'POST'
-                });
+        try {
+        const res = await fetch(`/api/control/stepper/timer/${unitCount}`, {
+        method: 'POST'
+        });
 
-                if (!res.ok) {
-                    const text = await res.text();
-                    throw new Error(text);
-                }
+        if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text);
+        }
 
-                updateStepperUI(true);
+        updateStepperUI(true);
 
-                alert(`液肥已啟動定時 ${unitCount * 10} 分鐘`);
-            } catch (err) {
-                console.error("❌ 液肥定時控制失敗:", err);
-                alert("液肥定時控制失敗，請檢查後端與 MQTT 連線。");
-            } finally {
-                if (timerBtn) timerBtn.disabled = false;
-                if (cancelBtn) cancelBtn.disabled = false;
-            }
+        alert(`液肥已啟動定時 ${unitCount * 10} 分鐘`);
+        } catch (err) {
+        console.error("❌ 液肥定時控制失敗:", err);
+        alert("液肥定時控制失敗，請檢查後端與 MQTT 連線。");
+        } finally {
+        if (timerBtn) timerBtn.disabled = false;
+        if (cancelBtn) cancelBtn.disabled = false;
+        }
         }
 
         async function cancelStepperTimer() {
-            const timerBtn = document.getElementById('stepperTimerBtn');
-            const cancelBtn = document.getElementById('stepperCancelTimerBtn');
+        const timerBtn = document.getElementById('stepperTimerBtn');
+        const cancelBtn = document.getElementById('stepperCancelTimerBtn');
 
-            if (timerBtn) timerBtn.disabled = true;
-            if (cancelBtn) cancelBtn.disabled = true;
+        if (timerBtn) timerBtn.disabled = true;
+        if (cancelBtn) cancelBtn.disabled = true;
 
-            try {
-                const res = await fetch('/api/control/stepper/timer/0', {
-                    method: 'POST'
-                });
+        try {
+        const res = await fetch('/api/control/stepper/timer/0', {
+        method: 'POST'
+        });
 
-                if (!res.ok) {
-                    const text = await res.text();
-                    throw new Error(text);
-                }
+        if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text);
+        }
 
-                updateStepperUI(false);
+        updateStepperUI(false);
 
-                alert("液肥定時已取消並關閉");
-            } catch (err) {
-                console.error("❌ 液肥取消定時失敗:", err);
-                alert("液肥取消定時失敗，請檢查後端與 MQTT 連線。");
-            } finally {
-                if (timerBtn) timerBtn.disabled = false;
-                if (cancelBtn) cancelBtn.disabled = false;
-            }
+        alert("液肥定時已取消並關閉");
+        } catch (err) {
+        console.error("❌ 液肥取消定時失敗:", err);
+        alert("液肥取消定時失敗，請檢查後端與 MQTT 連線。");
+        } finally {
+        if (timerBtn) timerBtn.disabled = false;
+        if (cancelBtn) cancelBtn.disabled = false;
+        }
         }
 
         async function startSignalR() {
-            const statusBadge = document.getElementById('connectionStatus');
-            const statusText = document.getElementById('connText');
+        const statusBadge = document.getElementById('connectionStatus');
+        const statusText = document.getElementById('connText');
 
-            try {
-                hubConnection = new signalR.HubConnectionBuilder()
-                    .withUrl("/sensorHub")
-                    .withAutomaticReconnect()
-                    .build();
+        try {
+        hubConnection = new signalR.HubConnectionBuilder()
+        .withUrl("/sensorHub")
+        .withAutomaticReconnect()
+        .build();
 
-                hubConnection.on("ReceiveSensorData", (data) => {
-                    updateDashboard(data);
-                });
+        hubConnection.on("ReceiveSensorData", (data) => {
+        updateDashboard(data);
+        });
 
-                hubConnection.onreconnecting(() => {
-                    if (statusBadge) statusBadge.className = "status-pill warn";
-                    if (statusText) statusText.innerText = "重新連線中...";
-                });
+        hubConnection.onreconnecting(() => {
+        if (statusBadge) statusBadge.className = "status-pill warn";
+        if (statusText) statusText.innerText = "重新連線中...";
+        });
 
-                hubConnection.onreconnected(() => {
-                    if (statusBadge) statusBadge.className = "status-pill ok";
-                    if (statusText) statusText.innerText = "已連線";
-                });
+        hubConnection.onreconnected(() => {
+        if (statusBadge) statusBadge.className = "status-pill ok";
+        if (statusText) statusText.innerText = "已連線";
+        });
 
-                hubConnection.onclose(() => {
-                    if (statusBadge) statusBadge.className = "status-pill warn";
-                    if (statusText) statusText.innerText = "已斷線";
-                });
+        hubConnection.onclose(() => {
+        if (statusBadge) statusBadge.className = "status-pill warn";
+        if (statusText) statusText.innerText = "已斷線";
+        });
 
-                await hubConnection.start();
-                console.log("✅ SignalR 已連線");
+        await hubConnection.start();
+        console.log("✅ SignalR 已連線");
 
-                if (statusBadge) statusBadge.className = "status-pill ok";
-                if (statusText) statusText.innerText = "已連線";
-            } catch (err) {
-                console.error("❌ SignalR 連線錯誤:", err);
+        if (statusBadge) statusBadge.className = "status-pill ok";
+        if (statusText) statusText.innerText = "已連線";
+        } catch (err) {
+        console.error("❌ SignalR 連線錯誤:", err);
 
-                if (statusBadge) statusBadge.className = "status-pill warn";
-                if (statusText) statusText.innerText = "SignalR 失敗";
+        if (statusBadge) statusBadge.className = "status-pill warn";
+        if (statusText) statusText.innerText = "SignalR 失敗";
 
-                setTimeout(startSignalR, 5000);
-            }
+        setTimeout(startSignalR, 5000);
+        }
         }
 
         async function loadLatest() {
-            try {
-                console.log("開始載入 Latest...");
-                const res = await fetch('/Data/Latest');
+        try {
+        console.log("開始載入 Latest...");
+        const res = await fetch('/Data/Latest');
 
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-                const data = await res.json();
-                console.log("Latest 成功:", data);
-                updateDashboard(data);
-            } catch (e) {
-                console.error("最新資料載入失敗:", e);
+        const data = await res.json();
+        console.log("Latest 成功:", data);
+        updateDashboard(data);
+        } catch (e) {
+        console.error("最新資料載入失敗:", e);
 
-                const statusBadge = document.getElementById('connectionStatus');
-                const statusText = document.getElementById('connText');
+        const statusBadge = document.getElementById('connectionStatus');
+        const statusText = document.getElementById('connText');
 
-                if (statusBadge) statusBadge.className = "status-pill warn";
-                if (statusText) statusText.innerText = "Latest 失敗";
-            }
+        if (statusBadge) statusBadge.className = "status-pill warn";
+        if (statusText) statusText.innerText = "Latest 失敗";
+        }
         }
 
         async function loadHistory() {
-            const exportBtn = document.getElementById('exportBtn');
+        const exportBtn = document.getElementById('exportBtn');
 
-            if (exportBtn) {
-                exportBtn.href = `/Data/Export?minutes=${currentDuration}`;
-            }
+        if (exportBtn) {
+        exportBtn.href = `/Data/Export?minutes=${currentDuration}`;
+        }
 
-            const canvas = document.getElementById('historyChart');
-            if (!canvas) return;
+        const canvas = document.getElementById('historyChart');
+        if (!canvas) return;
 
-            const ctx = canvas.getContext('2d');
-            if (chartInstance) chartInstance.destroy();
+        const ctx = canvas.getContext('2d');
+        if (chartInstance) chartInstance.destroy();
 
-            try {
-                console.log("開始載入 History...");
-                const res = await fetch(`/Data/History?minutes=${currentDuration}`);
+        try {
+        console.log("開始載入 History...");
+        const res = await fetch(`/Data/History?minutes=${currentDuration}`);
 
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-                const data = await res.json();
-                console.log("History 成功:", data);
+        const data = await res.json();
+        console.log("History 成功:", data);
 
-                const values = data.map(d => {
-                    const value = Number(getVal(d, currentMetric));
+        const values = data.map(d => {
+        const value = Number(getVal(d, currentMetric));
 
-                    if (Number.isNaN(value)) return null;
+        if (Number.isNaN(value)) return null;
 
-                    if (currentMetric === 'temp' && (value <= 0 || value > 60)) return null;
-                    if (currentMetric === 'humidity' && (value <= 0 || value > 100)) return null;
-                    if (currentMetric === 'soil' && (value < 0 || value > 1024)) return null;
+        if (currentMetric === 'temp' && (value <= 0 || value > 60)) return null;
+        if (currentMetric === 'humidity' && (value <= 0 || value > 100)) return null;
+        if (currentMetric === 'soil' && (value < 0 || value > 1024)) return null;
 
-                    return value;
-                });
+        return value;
+        });
 
-                const rawTimes = data.map(d => new Date(d.time || d.Time || d.CreatedAt));
+        const rawTimes = data.map(d => new Date(d.time || d.Time || d.CreatedAt));
 
-                const labels = rawTimes.map(dt => {
-                    const hh = String(dt.getHours()).padStart(2, '0');
-                    const mm = String(dt.getMinutes()).padStart(2, '0');
-                    return `${hh}:${mm}`;
-                });
+        const labels = rawTimes.map(dt => {
+        const hh = String(dt.getHours()).padStart(2, '0');
+        const mm = String(dt.getMinutes()).padStart(2, '0');
+        return `${hh}:${mm}`;
+        });
 
-                let gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                gradient.addColorStop(0, COLORS[currentMetric] + '50');
-                gradient.addColorStop(1, COLORS[currentMetric] + '00');
+        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, COLORS[currentMetric] + '50');
+        gradient.addColorStop(1, COLORS[currentMetric] + '00');
 
-                const metricLabels = {
-                    temp: '溫度',
-                    humidity: '濕度',
-                    soil: '土壤乾燥值'
-                };
+        const metricLabels = {
+        temp: '溫度',
+        humidity: '濕度',
+        soil: '土壤乾燥值'
+        };
 
-                chartInstance = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: metricLabels[currentMetric] || currentMetric,
-                            data: values,
-                            borderColor: COLORS[currentMetric],
-                            backgroundColor: gradient,
-                            borderWidth: 3,
-                            pointRadius: 0,
-                            pointHoverRadius: 6,
-                            fill: true,
-                            tension: 0.35,
-                            spanGaps: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        normalized: true,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    title: function (context) {
-                                        const idx = context[0].dataIndex;
-                                        const dt = rawTimes[idx];
+        chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+        labels: labels,
+        datasets: [{
+        label: metricLabels[currentMetric] || currentMetric,
+        data: values,
+        borderColor: COLORS[currentMetric],
+        backgroundColor: gradient,
+        borderWidth: 3,
+        pointRadius: 0,
+        pointHoverRadius: 6,
+        fill: true,
+        tension: 0.35,
+        spanGaps: true
+        }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        normalized: true,
+        plugins: {
+        legend: { display: false },
+        tooltip: {
+        callbacks: {
+        title: function (context) {
+        const idx = context[0].dataIndex;
+        const dt = rawTimes[idx];
 
-                                        return dt.toLocaleTimeString('zh-TW', {
-                                            hour12: false,
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                            second: '2-digit'
-                                        });
-                                    },
-                                    label: function (context) {
-                                        const value = context.raw;
+        return dt.toLocaleTimeString('zh-TW', {
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+        });
+        },
+        label: function (context) {
+        const value = context.raw;
 
-                                        if (value === null || value === undefined) {
-                                            return '無有效資料';
-                                        }
+        if (value === null || value === undefined) {
+        return '無有效資料';
+        }
 
-                                        if (currentMetric === 'temp') {
-                                            return `溫度：${value} °C`;
-                                        }
+        if (currentMetric === 'temp') {
+        return `溫度：${value} °C`;
+        }
 
-                                        if (currentMetric === 'humidity') {
-                                            return `濕度：${value} %`;
-                                        }
+        if (currentMetric === 'humidity') {
+        return `濕度：${value} %`;
+        }
 
-                                        if (currentMetric === 'soil') {
-                                            return `土壤乾燥值：${value}`;
-                                        }
+        if (currentMetric === 'soil') {
+        return `土壤乾燥值：${value}`;
+        }
 
-                                        return `${currentMetric}: ${value}`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                grid: {
-                                    display: false
-                                },
-                                ticks: {
-                                    color: '#888',
-                                    autoSkip: true,
-                                    maxTicksLimit: 8,
-                                    maxRotation: 0,
-                                    minRotation: 0
-                                }
-                            },
-                            y: {
-                                beginAtZero: currentMetric === 'soil',
-                                suggestedMin: currentMetric === 'humidity' ? 0 : undefined,
-                                suggestedMax: currentMetric === 'humidity' ? 100 : undefined,
-                                border: {
-                                    display: false
-                                },
-                                grid: {
-                                    color: 'rgba(200,200,200,0.1)'
-                                }
-                            }
-                        },
-                        interaction: {
-                            mode: 'index',
-                            intersect: false
-                        }
-                    }
-                });
-            } catch (e) {
-                console.error("歷史數據載入失敗:", e);
-            }
+        return `${currentMetric}: ${value}`;
+        }
+        }
+        }
+        },
+        scales: {
+        x: {
+        grid: {
+        display: false
+        },
+        ticks: {
+        color: '#888',
+        autoSkip: true,
+        maxTicksLimit: 8,
+        maxRotation: 0,
+        minRotation: 0
+        }
+        },
+        y: {
+        beginAtZero: currentMetric === 'soil',
+        suggestedMin: currentMetric === 'humidity' ? 0 : undefined,
+        suggestedMax: currentMetric === 'humidity' ? 100 : undefined,
+        border: {
+        display: false
+        },
+        grid: {
+        color: 'rgba(200,200,200,0.1)'
+        }
+        }
+        },
+        interaction: {
+        mode: 'index',
+        intersect: false
+        }
+        }
+        });
+        } catch (e) {
+        console.error("歷史數據載入失敗:", e);
+        }
         }
 
         function startHistoryAutoRefresh() {
-            if (historyRefreshTimer) {
-                clearInterval(historyRefreshTimer);
-            }
+        if (historyRefreshTimer) {
+        clearInterval(historyRefreshTimer);
+        }
 
-            historyRefreshTimer = setInterval(() => {
-                console.log("⏰ 圖表每 1 分鐘自動更新一次");
-                loadHistory();
-            }, 60 * 1000);
+        historyRefreshTimer = setInterval(() => {
+        console.log("⏰ 圖表每 1 分鐘自動更新一次");
+        loadHistory();
+        }, 60 * 1000);
         }
 
         function changeMetric(m, btn) {
-            currentMetric = m;
+        currentMetric = m;
 
-            document.querySelectorAll('.btn-toggle').forEach(b => {
-                if (b.parentElement === btn.parentElement) {
-                    b.classList.remove('active');
-                }
-            });
+        document.querySelectorAll('.btn-toggle').forEach(b => {
+        if (b.parentElement === btn.parentElement) {
+        b.classList.remove('active');
+        }
+        });
 
-            btn.classList.add('active');
-            loadHistory();
+        btn.classList.add('active');
+        loadHistory();
         }
 
         function changeDuration(d, btn) {
-            currentDuration = d;
+        currentDuration = d;
 
-            document.querySelectorAll('.btn-toggle').forEach(b => {
-                if (b.parentElement === btn.parentElement) {
-                    b.classList.remove('active');
-                }
-            });
+        document.querySelectorAll('.btn-toggle').forEach(b => {
+        if (b.parentElement === btn.parentElement) {
+        b.classList.remove('active');
+        }
+        });
 
-            btn.classList.add('active');
-            loadHistory();
+        btn.classList.add('active');
+        loadHistory();
         }
 
         function toggleTheme() {
-            const body = document.body;
-            body.setAttribute(
-                'data-theme',
-                body.getAttribute('data-theme') === 'dark' ? '' : 'dark'
-            );
+        const body = document.body;
+        body.setAttribute(
+        'data-theme',
+        body.getAttribute('data-theme') === 'dark' ? '' : 'dark'
+        );
 
-            loadHistory();
+        loadHistory();
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log("✅ DOMContentLoaded 已觸發");
+        console.log("✅ DOMContentLoaded 已觸發");
 
-            await loadLatest();
-            await loadHistory();
+        await loadLatest();
+        await loadHistory();
 
-            startSignalR();
-            startHistoryAutoRefresh();
+        startSignalR();
+        startHistoryAutoRefresh();
         });
     </script>
 </body>

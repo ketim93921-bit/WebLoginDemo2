@@ -873,7 +873,7 @@ public class LineWebhookController : ControllerBase
         {
             "DRY" => "⚠️ 乾燥",
             "MOIST" => "✅ 適中",
-            "WET" => "💧 濕潤",
+            "WET" => "💧 潮濕",
             _ => string.IsNullOrWhiteSpace(soilState) ? "未知" : soilState
         };
     }

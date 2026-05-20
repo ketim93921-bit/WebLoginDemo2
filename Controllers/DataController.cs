@@ -156,7 +156,7 @@ namespace WebLoginDemo2.Controllers
             {
                 "DRY" => "乾燥",
                 "MOIST" => "適中",
-                "WET" => "濕潤",
+                "WET" => "潮濕",
                 _ => soilState ?? string.Empty
             };
         }
