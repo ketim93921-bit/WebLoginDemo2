@@ -13,6 +13,8 @@ namespace WebLoginDemo2.Controllers
         private readonly AppDbContext _db;
         private readonly MqttService _mqttService;
 
+        private const int MaxHistoryMinutes = 10080; // 7 天
+
         public DataController(AppDbContext db, MqttService mqttService)
         {
             _db = db;
@@ -32,18 +34,22 @@ namespace WebLoginDemo2.Controllers
 
         // ==========================================
         // 2. 取得歷史數據
-        // API: GET /Data/History?minutes=10
+        // API: GET /Data/History?minutes=10080
+        //
+        // 10 / 30 / 60 分鐘：每 1 分鐘平均
+        // 1 天：每 5 分鐘平均
+        // 1 週：每 60 分鐘平均
         // ==========================================
         [HttpGet("History")]
         public async Task<IActionResult> History(int minutes = 60)
         {
-            minutes = Math.Clamp(minutes, 1, 1440);
+            minutes = Math.Clamp(minutes, 1, MaxHistoryMinutes);
 
-            var startTime = DateTime.Now.AddMinutes(-minutes);
+            var startTimeUtc = DateTime.UtcNow.AddMinutes(-minutes);
 
             var rawData = await _db.SensorLogs
                 .AsNoTracking()
-                .Where(s => s.CreatedAt >= startTime)
+                .Where(s => s.CreatedAt >= startTimeUtc)
                 .Where(s =>
                     s.Temp > 0 &&
                     s.Temp < 60 &&
@@ -54,29 +60,32 @@ namespace WebLoginDemo2.Controllers
                 .OrderBy(s => s.CreatedAt)
                 .ToListAsync();
 
+            int bucketMinutes = GetBucketMinutes(minutes);
+            long bucketTicks = TimeSpan.FromMinutes(bucketMinutes).Ticks;
+
             var chartData = rawData
-                .GroupBy(x => new
+                .GroupBy(x =>
                 {
-                    x.CreatedAt.Year,
-                    x.CreatedAt.Month,
-                    x.CreatedAt.Day,
-                    x.CreatedAt.Hour,
-                    x.CreatedAt.Minute
+                    var utcTime = NormalizeAsUtc(x.CreatedAt);
+                    long bucket = utcTime.Ticks / bucketTicks;
+                    return bucket;
                 })
                 .Select(g =>
                 {
-                    var last = g.OrderBy(x => x.CreatedAt).Last();
+                    var last = g
+                        .OrderBy(x => NormalizeAsUtc(x.CreatedAt))
+                        .Last();
+
+                    var bucketUtc = new DateTime(
+                        g.Key * bucketTicks,
+                        DateTimeKind.Utc
+                    );
 
                     return new
                     {
-                        time = new DateTime(
-                            g.Key.Year,
-                            g.Key.Month,
-                            g.Key.Day,
-                            g.Key.Hour,
-                            g.Key.Minute,
-                            0
-                        ),
+                        // 回傳標準 UTC ISO 時間
+                        // 前端用 Asia/Taipei 顯示
+                        time = bucketUtc.ToString("O"),
 
                         temp = Math.Round(g.Average(x => x.Temp), 1),
                         humidity = Math.Round(g.Average(x => x.Humidity), 1),
@@ -96,18 +105,18 @@ namespace WebLoginDemo2.Controllers
 
         // ==========================================
         // 3. 匯出 CSV 檔案
-        // API: GET /Data/Export?minutes=60
+        // API: GET /Data/Export?minutes=10080
         // ==========================================
         [HttpGet("Export")]
         public async Task<IActionResult> Export(int minutes = 60)
         {
-            minutes = Math.Clamp(minutes, 1, 1440);
+            minutes = Math.Clamp(minutes, 1, MaxHistoryMinutes);
 
-            var startTime = DateTime.Now.AddMinutes(-minutes);
+            var startTimeUtc = DateTime.UtcNow.AddMinutes(-minutes);
 
             var data = await _db.SensorLogs
                 .AsNoTracking()
-                .Where(s => s.CreatedAt >= startTime)
+                .Where(s => s.CreatedAt >= startTimeUtc)
                 .OrderByDescending(s => s.CreatedAt)
                 .ToListAsync();
 
@@ -122,8 +131,10 @@ namespace WebLoginDemo2.Controllers
 
             foreach (var item in data)
             {
+                var taipeiTime = ToTaipeiTime(item.CreatedAt);
+
                 builder.AppendLine(
-                    $"{item.CreatedAt:yyyy-MM-dd HH:mm:ss}," +
+                    $"{taipeiTime:yyyy-MM-dd HH:mm:ss}," +
                     $"{item.Temp}," +
                     $"{item.Humidity}," +
                     $"{item.Soil}," +
@@ -143,6 +154,49 @@ namespace WebLoginDemo2.Controllers
             string fileName = $"SensorData_{DateTime.Now:yyyyMMdd_HHmm}.csv";
 
             return File(result, "text/csv; charset=big5", fileName);
+        }
+
+        private static int GetBucketMinutes(int minutes)
+        {
+            if (minutes <= 60)
+                return 1;
+
+            if (minutes <= 1440)
+                return 5;
+
+            return 60;
+        }
+
+        private static DateTime NormalizeAsUtc(DateTime value)
+        {
+            return value.Kind switch
+            {
+                DateTimeKind.Utc => value,
+                DateTimeKind.Local => value.ToUniversalTime(),
+
+                // Render / 雲端常見資料會是 Unspecified，但實際是 UTC
+                _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
+            };
+        }
+
+        private static DateTime ToTaipeiTime(DateTime value)
+        {
+            var utc = NormalizeAsUtc(value);
+            var taipeiZone = GetTaipeiTimeZone();
+
+            return TimeZoneInfo.ConvertTimeFromUtc(utc, taipeiZone);
+        }
+
+        private static TimeZoneInfo GetTaipeiTimeZone()
+        {
+            try
+            {
+                return TimeZoneInfo.FindSystemTimeZoneById("Asia/Taipei");
+            }
+            catch
+            {
+                return TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
+            }
         }
 
         private static string BoolText(bool value)
