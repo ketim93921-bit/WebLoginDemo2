@@ -145,16 +145,22 @@ public class LineWebhookController : ControllerBase
                 await _line.ReplyMessagesAsync(replyToken, BuildFertilizerControlReply());
                 break;
 
+            // ==============================
+            // 生長燈恆開
+            // ==============================
             case "生長燈開":
+            case "生長燈恆開":
             case "D6開":
+            case "D6恆開":
             case "Relay6開":
-                await ExecuteRelay6Async(replyToken, true);
+            case "Relay6恆開":
+                await ExecuteRelay6AlwaysOnAsync(replyToken);
                 break;
 
             case "生長燈關":
             case "D6關":
             case "Relay6關":
-                await ExecuteRelay6Async(replyToken, false);
+                await ExecuteRelay6OffAsync(replyToken);
                 break;
 
             case "生長燈定時10":
@@ -298,12 +304,16 @@ public class LineWebhookController : ControllerBase
                 await _line.ReplyMessagesAsync(replyToken, BuildFertilizerControlReply());
                 break;
 
+            // ==============================
+            // 生長燈恆開
+            // ==============================
             case "action=relay6_on":
-                await ExecuteRelay6Async(replyToken, true);
+            case "action=relay6_always_on":
+                await ExecuteRelay6AlwaysOnAsync(replyToken);
                 break;
 
             case "action=relay6_off":
-                await ExecuteRelay6Async(replyToken, false);
+                await ExecuteRelay6OffAsync(replyToken);
                 break;
 
             case "action=relay6_timer_1":
@@ -386,24 +396,46 @@ public class LineWebhookController : ControllerBase
     // =====================================================
     // 執行控制
     // =====================================================
-    private async Task ExecuteRelay6Async(string replyToken, bool on)
+    private async Task ExecuteRelay6AlwaysOnAsync(string replyToken)
     {
         try
         {
-            await _mqtt.PublishRelayCommandAsync(6, on);
+            await _mqtt.PublishRelayCommandAsync(6, true);
 
             await _line.ReplyTextAsync(
                 replyToken,
-                on ? "💡 生長燈已開啟" : "🛑 生長燈已關閉"
+                "💡 生長燈已恆開"
             );
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[LINE] 生長燈控制失敗");
+            _logger.LogError(ex, "[LINE] 生長燈恆開控制失敗");
 
             await _line.ReplyTextAsync(
                 replyToken,
-                "❌ 生長燈控制失敗，請檢查 MQTT 或設備連線"
+                "❌ 生長燈恆開控制失敗，請檢查 MQTT 或設備連線"
+            );
+        }
+    }
+
+    private async Task ExecuteRelay6OffAsync(string replyToken)
+    {
+        try
+        {
+            await _mqtt.PublishRelayCommandAsync(6, false);
+
+            await _line.ReplyTextAsync(
+                replyToken,
+                "🛑 生長燈已關閉"
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[LINE] 生長燈關閉失敗");
+
+            await _line.ReplyTextAsync(
+                replyToken,
+                "❌ 生長燈關閉失敗，請檢查 MQTT 或設備連線"
             );
         }
     }
@@ -721,10 +753,11 @@ public class LineWebhookController : ControllerBase
                             },
                             new {
                                 type = "text",
-                                text = "1 單位 = 10 分鐘",
+                                text = "恆開不會自動關閉；定時會時間到自動關閉",
                                 size = "lg",
                                 align = "center",
-                                color = "#666666"
+                                color = "#666666",
+                                wrap = true
                             }
                         }
                     },
@@ -735,7 +768,7 @@ public class LineWebhookController : ControllerBase
                         spacing = "md",
                         contents = new object[]
                         {
-                            BuildPostbackButton("立即開啟", "action=relay6_on", "生長燈開", "#16A34A"),
+                            BuildPostbackButton("恆開", "action=relay6_always_on", "生長燈恆開", "#16A34A"),
                             BuildPostbackButton("立即關閉", "action=relay6_off", "生長燈關", "#DC2626"),
                             BuildPostbackButton("定時 10 分鐘", "action=relay6_timer_1", "生長燈定時10", "#2563EB"),
                             BuildPostbackButton("定時 20 分鐘", "action=relay6_timer_2", "生長燈定時20", "#2563EB"),

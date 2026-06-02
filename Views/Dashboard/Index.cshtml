@@ -280,7 +280,6 @@
 
         <div class="dashboard-grid">
 
-            <!-- 第一排 1：溫度 -->
             <div class="stat-card" style="border-bottom: 4px solid var(--accent-temp)">
                 <div class="card-bg-circle" style="background: var(--accent-temp)"></div>
                 <div class="card-header-custom">
@@ -298,7 +297,6 @@
                 </div>
             </div>
 
-            <!-- 第一排 2：濕度 -->
             <div class="stat-card" style="border-bottom: 4px solid var(--accent-hum)">
                 <div class="card-bg-circle" style="background: var(--accent-hum)"></div>
                 <div class="card-header-custom">
@@ -316,7 +314,6 @@
                 </div>
             </div>
 
-            <!-- 第一排 3：土壤 -->
             <div class="stat-card" style="border-bottom: 4px solid var(--accent-soil)">
                 <div class="card-bg-circle" style="background: var(--accent-soil)"></div>
                 <div class="card-header-custom">
@@ -334,7 +331,6 @@
                 </div>
             </div>
 
-            <!-- 第二排 1：滴灌 -->
             <div class="stat-card" style="border-bottom: 4px solid var(--accent-hum)">
                 <div class="card-bg-circle" style="background: var(--accent-hum)"></div>
                 <div class="card-header-custom">
@@ -355,7 +351,6 @@
                 </div>
             </div>
 
-            <!-- 第二排 2：生長燈 -->
             <div class="stat-card" style="border-bottom: 4px solid var(--accent-soil)">
                 <div class="card-bg-circle" style="background: var(--accent-soil)"></div>
                 <div class="card-header-custom">
@@ -380,6 +375,7 @@
                         <label class="unit-label mb-2 d-block">生長燈定時控制</label>
                         <div class="d-flex gap-2">
                             <select id="relay6TimerUnit" class="btn-toggle flex-fill">
+                                <option value="always">恆開</option>
                                 <option value="1">10 分鐘</option>
                                 <option value="2">20 分鐘</option>
                                 <option value="3">30 分鐘</option>
@@ -400,7 +396,6 @@
                 </div>
             </div>
 
-            <!-- 第二排 3：液肥 -->
             <div class="stat-card" style="border-bottom: 4px solid var(--accent-temp)">
                 <div class="card-bg-circle" style="background: var(--accent-temp)"></div>
                 <div class="card-header-custom">
@@ -724,12 +719,29 @@
 
         if (!select) return;
 
-        const unitCount = Number(select.value);
+        const selectedValue = select.value;
 
         if (timerBtn) timerBtn.disabled = true;
         if (cancelBtn) cancelBtn.disabled = true;
 
         try {
+        if (selectedValue === 'always') {
+        const res = await fetch('/api/control/relay/6/on', {
+        method: 'POST'
+        });
+
+        if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text);
+        }
+
+        updateRelayUI(6, true);
+        alert('生長燈已恆開');
+        return;
+        }
+
+        const unitCount = Number(selectedValue);
+
         const res = await fetch(`/api/control/relay6/timer/${unitCount}`, {
         method: 'POST'
         });
@@ -742,8 +754,8 @@
         updateRelayUI(6, true);
         alert(`生長燈已啟動定時 ${unitCount * 10} 分鐘`);
         } catch (err) {
-        console.error("❌ 生長燈定時控制失敗:", err);
-        alert("生長燈定時控制失敗，請檢查後端與 MQTT 連線。");
+        console.error("❌ 生長燈控制失敗:", err);
+        alert("生長燈控制失敗，請檢查後端與 MQTT 連線。");
         } finally {
         if (timerBtn) timerBtn.disabled = false;
         if (cancelBtn) cancelBtn.disabled = false;
